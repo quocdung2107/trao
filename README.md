@@ -33,7 +33,9 @@ chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng m�
 - Mọi bảng trong `public` bật RLS. Quyền theo sự kiện: `owner`, `cohost`, `staff`, `viewer`
   (hàm `private.has_event_role`). Khách không đăng nhập không đọc trực tiếp bảng nào.
 - Thao tác cần kiểm tra quyền phức tạp đi qua RPC `security definer` có kiểm tra `auth.uid()` bên trong
-  (`create_event`, `accept_event_invite`, `trash_event`, `restore_event`, `import_guests`, `undo_import`).
+  (`create_event`, `accept_event_invite`, `trash_event`, `restore_event`, `import_guests`, `undo_import`, `event_stats`).
+- Khách không đăng nhập chỉ đi qua RPC: `get_invitation`, `get_guest_invitation`, `submit_rsvp`, `post_wish`
+  (xác thực bằng token 128 bit của khách; không RPC nào trả SĐT).
 - Khách xem thiệp qua `get_invitation(slug)` (chỉ thiệp đã xuất bản). Ảnh thiệp nằm trong bucket
   `event-media`, đường dẫn `<event_id>/<tên file>`; chỉ owner/cohost được ghi.
 - Thay đổi schema: thêm file mới trong `supabase/migrations/`, viết test pgTAP đi kèm,
@@ -45,7 +47,7 @@ chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng m�
 |---|---|---|
 | M0 | Nền móng: đăng nhập, workspace, sự kiện, buổi tiệc, người quản lý, RLS, CI | xong |
 | M1 | Mẫu thiệp, trình sửa, xuất bản, ảnh xem trước Zalo | xong |
-| M2 | Khách mời, nhập Excel, link cá nhân, RSVP | đang làm (khách + nhập Excel xong) |
+| M2 | Khách mời, nhập Excel, link cá nhân, RSVP, lời chúc | xong |
 | M3 | Xếp bàn, check-in | |
 | M4 | Hoàn thiện, xuất Excel, thử với sự kiện thật | |
 

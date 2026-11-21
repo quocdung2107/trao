@@ -23,6 +23,7 @@ export const invitationContentSchema = z.object({
   coverImage: mediaPath.nullable().default(null),
   gallery: z.array(mediaPath).max(MAX_GALLERY).default([]),
   showCountdown: z.boolean().default(true),
+  showWishes: z.boolean().default(true),
 });
 
 export type InvitationContent = z.infer<typeof invitationContentSchema>;

@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
 import type { InvitationView } from "../view";
-import { BaseTemplate, type Theme } from "./base";
+import { BaseTemplate, type TemplateSlots, type Theme } from "./base";
 
 function Leaf({ color }: { color: string }) {
   return (
@@ -38,7 +37,7 @@ export function isTemplateKey(k: string): k is TemplateKey {
   return k in THEMES;
 }
 
-export function InvitationTemplate({ templateKey, view, footer }: { templateKey: string; view: InvitationView; footer?: ReactNode }) {
+export function InvitationTemplate({ templateKey, view, ...slots }: { templateKey: string; view: InvitationView } & TemplateSlots) {
   const theme = THEMES[isTemplateKey(templateKey) ? templateKey : DEFAULT_TEMPLATE];
-  return <BaseTemplate view={view} theme={theme} footer={footer} />;
+  return <BaseTemplate view={view} theme={theme} {...slots} />;
 }

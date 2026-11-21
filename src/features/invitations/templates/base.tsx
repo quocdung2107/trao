@@ -17,7 +17,10 @@ function Section({ children, className = "" }: { children: ReactNode; className?
   return <section className={`px-6 py-10 text-center ${className}`}>{children}</section>;
 }
 
-export function BaseTemplate({ view, theme, footer }: { view: InvitationView; theme: Theme; footer?: ReactNode }) {
+/** Phần gắn thêm vào thiệp ở trang công khai: lời mời đích danh, RSVP, lời chúc. */
+export type TemplateSlots = { greeting?: string | null; rsvp?: ReactNode; wishes?: ReactNode; footer?: ReactNode };
+
+export function BaseTemplate({ view, theme, greeting, rsvp, wishes, footer }: { view: InvitationView; theme: Theme } & TemplateSlots) {
   const { content: c, sessions } = view;
   const heading = theme.headingFont === "serif" ? "font-serif" : "font-sans font-semibold tracking-tight";
   const style = Object.fromEntries(Object.entries(theme.vars).map(([k, val]) => [`--inv-${k}`, val])) as CSSProperties;
@@ -58,6 +61,11 @@ export function BaseTemplate({ view, theme, footer }: { view: InvitationView; th
         <p className="text-sm uppercase tracking-[0.25em]" style={{ color: v("muted") }}>
           {c.heading}
         </p>
+        {greeting && (
+          <p className={`${heading} mt-3 text-2xl`} style={{ color: v("accent") }}>
+            {greeting}
+          </p>
+        )}
         {people.length > 0 && (
           <div className="mt-6 grid gap-6" style={{ gridTemplateColumns: people.length > 1 ? "1fr 1fr" : "1fr" }}>
             {people.map((p, i) => (
@@ -127,6 +135,8 @@ export function BaseTemplate({ view, theme, footer }: { view: InvitationView; th
         </Section>
       )}
 
+      {rsvp && <Section className="pt-0">{rsvp}</Section>}
+
       {c.showCountdown && start && (
         <Section className="pt-0">
           <Countdown target={start} className="flex justify-center gap-3" />
@@ -149,6 +159,8 @@ export function BaseTemplate({ view, theme, footer }: { view: InvitationView; th
           </div>
         </Section>
       )}
+
+      {wishes && <Section className="pt-0">{wishes}</Section>}
 
       {c.closing && (
         <Section className="pt-0">

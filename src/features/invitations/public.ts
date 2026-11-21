@@ -5,7 +5,8 @@ import type { InvitationSession, InvitationView } from "./view";
 
 export const invitationTag = (slug: string) => `inv:${slug}`;
 
-export type PublicInvitation = InvitationView & { slug: string; template_key: string; updated_at: string };
+export type Wish = { author_name: string; message: string; created_at: string };
+export type PublicInvitation = InvitationView & { slug: string; template_key: string; updated_at: string; wishes: Wish[] };
 
 /** Thiệp đã xuất bản, đọc bằng khóa publishable (không cookie) nên cache được; xóa cache khi chủ tiệc lưu. */
 export async function getPublishedInvitation(slug: string): Promise<PublicInvitation | null> {
@@ -29,7 +30,40 @@ export async function getPublishedInvitation(slug: string): Promise<PublicInvita
     content: unknown;
     event: { title: string; event_type: string };
     sessions: InvitationSession[];
+    wishes?: Wish[];
   };
   if (!data) return null;
-  return { ...data, content: parseContent(data.content) };
+  return { ...data, wishes: data.wishes ?? [], content: parseContent(data.content) };
+}
+
+export type GuestInvite = Omit<InvitationSession, "id"> & {
+  session_id: string;
+  rsvp_status: "pending" | "yes" | "no" | "maybe";
+  attending_count: number | null;
+  rsvp_note: string | null;
+};
+export type GuestView = {
+  salutation: string;
+  max_party_size: number;
+  rsvp_deadline: string | null;
+  rsvp_closed: boolean;
+  consented: boolean;
+  invites: GuestInvite[];
+};
+
+export const isGuestToken = (t: unknown): t is string => typeof t === "string" && /^[A-Za-z0-9_-]{22}$/.test(t);
+
+/** Phần riêng của khách (không cache: câu trả lời RSVP đổi theo từng lần khách gửi). */
+export async function getGuestInvitation(slug: string, token: string): Promise<GuestView | null> {
+  if (!/^[A-Za-z0-9_-]{12}$/.test(slug) || !isGuestToken(token)) return null;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+  const res = await fetch(`${url}/rest/v1/rpc/get_guest_invitation`, {
+    method: "POST",
+    headers: { apikey: key, "Content-Type": "application/json" },
+    body: JSON.stringify({ p_slug: slug, p_token: token }),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`get_guest_invitation ${res.status}`);
+  return (await res.json()) as GuestView | null;
 }
