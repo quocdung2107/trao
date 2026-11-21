@@ -65,6 +65,98 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"guest_group_links": {
+                  Row: {
+                    "event_id": string,"group_id": string,"guest_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "event_id": string,"group_id": string,"guest_id": string
+                  }
+                  Update: {
+                    "event_id"?: string,"group_id"?: string,"guest_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "guest_group_links_group_id_event_id_fkey"
+      columns: ["group_id","event_id"]
+isOneToOne: false
+      referencedRelation: "guest_groups"
+      referencedColumns: ["id","event_id"]
+    },{
+      foreignKeyName: "guest_group_links_guest_id_event_id_fkey"
+      columns: ["guest_id","event_id"]
+isOneToOne: false
+      referencedRelation: "guests"
+      referencedColumns: ["id","event_id"]
+    }
+                  ]
+                },"guest_groups": {
+                  Row: {
+                    "color": string | null,"created_at": string,"event_id": string,"id": string,"name": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "color"?: string | null,"created_at"?: string,"event_id": string,"id"?: string,"name": string
+                  }
+                  Update: {
+                    "color"?: string | null,"created_at"?: string,"event_id"?: string,"id"?: string,"name"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "guest_groups_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"guests": {
+                  Row: {
+                    "created_at": string,"created_by": string | null,"deleted_at": string | null,"display_name": string,"email": string | null,"event_id": string,"id": string,"import_job_id": string | null,"invite_sent_at": string | null,"max_party_size": number,"notes": string | null,"phone_e164": string | null,"salutation": string | null,"search_text": string | null,"side": string | null,"source": string,"token": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"display_name": string,"email"?: string | null,"event_id": string,"id"?: string,"import_job_id"?: string | null,"invite_sent_at"?: string | null,"max_party_size"?: number,"notes"?: string | null,"phone_e164"?: string | null,"salutation"?: string | null,"search_text"?: never,"side"?: string | null,"source"?: string,"token"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string | null,"deleted_at"?: string | null,"display_name"?: string,"email"?: string | null,"event_id"?: string,"id"?: string,"import_job_id"?: string | null,"invite_sent_at"?: string | null,"max_party_size"?: number,"notes"?: string | null,"phone_e164"?: string | null,"salutation"?: string | null,"search_text"?: never,"side"?: string | null,"source"?: string,"token"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "guests_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "guests_import_job_id_fkey"
+      columns: ["import_job_id"]
+isOneToOne: false
+      referencedRelation: "import_jobs"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"import_jobs": {
+                  Row: {
+                    "created_at": string,"created_by": string,"created_rows": number,"event_id": string,"file_name": string | null,"id": string,"total_rows": number,"undone_at": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"created_by"?: string,"created_rows"?: number,"event_id": string,"file_name"?: string | null,"id"?: string,"total_rows"?: number,"undone_at"?: string | null
+                  }
+                  Update: {
+                    "created_at"?: string,"created_by"?: string,"created_rows"?: number,"event_id"?: string,"file_name"?: string | null,"id"?: string,"total_rows"?: number,"undone_at"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "import_jobs_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"invitations": {
                   Row: {
                     "content": NonNullable<Json>,"created_at": string,"created_by": string,"event_id": string,"id": string,"name": string,"published_at": string | null,"session_ids": (string)[] | null,"slug": string,"template_key": string,"template_version": number,"updated_at": string
@@ -98,6 +190,32 @@ isOneToOne: false
                   }
                   Relationships: [
                     
+                  ]
+                },"session_invites": {
+                  Row: {
+                    "attending_count": number | null,"created_at": string,"event_id": string,"guest_id": string,"id": string,"responded_at": string | null,"responded_via": string | null,"rsvp_note": string | null,"rsvp_status": string,"session_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attending_count"?: number | null,"created_at"?: string,"event_id": string,"guest_id": string,"id"?: string,"responded_at"?: string | null,"responded_via"?: string | null,"rsvp_note"?: string | null,"rsvp_status"?: string,"session_id": string
+                  }
+                  Update: {
+                    "attending_count"?: number | null,"created_at"?: string,"event_id"?: string,"guest_id"?: string,"id"?: string,"responded_at"?: string | null,"responded_via"?: string | null,"rsvp_note"?: string | null,"rsvp_status"?: string,"session_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "session_invites_guest_id_event_id_fkey"
+      columns: ["guest_id","event_id"]
+isOneToOne: false
+      referencedRelation: "guests"
+      referencedColumns: ["id","event_id"]
+    },{
+      foreignKeyName: "session_invites_session_id_event_id_fkey"
+      columns: ["session_id","event_id"]
+isOneToOne: false
+      referencedRelation: "sessions"
+      referencedColumns: ["id","event_id"]
+    }
                   ]
                 },"sessions": {
                   Row: {
@@ -168,11 +286,17 @@ isOneToOne: false
 "get_invitation":
 { Args: { "p_slug": string }; Returns: Json
                            },
+"import_guests":
+{ Args: { "p_event_id": string,"p_file_name": string,"p_rows": Json,"p_session_ids"?: (string)[] }; Returns: Json
+                           },
 "restore_event":
 { Args: { "p_event_id": string }; Returns: undefined
                            },
 "trash_event":
 { Args: { "p_event_id": string }; Returns: undefined
+                           },
+"undo_import":
+{ Args: { "p_job_id": string }; Returns: number
                            }
           }
           Enums: {

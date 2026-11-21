@@ -26,3 +26,18 @@ export const EVENT_STATUS = {
 export function label<T extends Record<string, string>>(map: T, key: string) {
   return (map as Record<string, string>)[key] ?? key;
 }
+
+export const GUEST_SIDES = {
+  groom: "Nhà trai",
+  bride: "Nhà gái",
+  host: "Chủ tiệc",
+} as const;
+export type GuestSide = keyof typeof GUEST_SIDES;
+
+export const RSVP_STATUS = {
+  pending: "Chưa trả lời",
+  yes: "Sẽ đến",
+  no: "Không đến",
+  maybe: "Chưa chắc",
+} as const;
+export type RsvpStatus = keyof typeof RSVP_STATUS;

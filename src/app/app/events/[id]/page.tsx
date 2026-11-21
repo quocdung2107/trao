@@ -8,6 +8,7 @@ import { Card, Input, Label, Select } from "@/components/ui";
 import { formatDateTime } from "@/features/events/format";
 import { getEventDetail } from "@/features/events/queries";
 import { createInvitation } from "@/features/invitations/actions";
+import { countGuests } from "@/features/guests/queries";
 import { listInvitations } from "@/features/invitations/queries";
 import { TEMPLATES } from "@/features/invitations/templates/registry";
 import { EVENT_ROLES, EVENT_STATUS, EVENT_TYPES, label } from "@/lib/labels";
@@ -42,7 +43,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
   const canEdit = myRole === "owner" || myRole === "cohost";
   const isOwner = myRole === "owner";
   const base = await siteUrl();
-  const invitations = await listInvitations(event.id);
+  const [invitations, guestCount] = await Promise.all([listInvitations(event.id), canEdit ? countGuests(event.id) : null]);
 
   return (
     <div className="space-y-6">
@@ -118,6 +119,25 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
           </ActionForm>
         )}
       </Card>
+
+      {/* Khách mời */}
+      {guestCount && (
+        <Card>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-serif text-lg">Khách mời</h2>
+              <p className="text-sm text-muted">
+                {guestCount.guests === 0
+                  ? "Chưa có khách nào. Nhập từ Excel hoặc thêm từng khách."
+                  : `${guestCount.guests} khách · ${guestCount.sent} đã gửi thiệp`}
+              </p>
+            </div>
+            <Link href={`/app/events/${event.id}/guests`} className={primaryBtn}>
+              {guestCount.guests === 0 ? "Thêm khách" : "Xem danh sách"}
+            </Link>
+          </div>
+        </Card>
+      )}
 
       {/* Buổi tiệc */}
       <Card>
