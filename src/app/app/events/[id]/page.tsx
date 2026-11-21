@@ -1,0 +1,226 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
+import { ActionForm, SubmitButton } from "@/components/action-form";
+import { CopyButton } from "@/components/copy-button";
+import { Card, Input, Label, Select } from "@/components/ui";
+import { formatDateTime } from "@/features/events/format";
+import { getEventDetail } from "@/features/events/queries";
+import { EVENT_ROLES, EVENT_STATUS, EVENT_TYPES, label } from "@/lib/labels";
+import { siteUrl } from "@/lib/site-url";
+import { getUserId } from "@/lib/supabase/server";
+import {
+  addSession,
+  changeMemberRole,
+  createInvite,
+  deleteSession,
+  removeMember,
+  revokeInvite,
+  trashEvent,
+  updateEventTitle,
+} from "../actions";
+
+export const metadata: Metadata = { title: "Sự kiện" };
+
+const primaryBtn = "rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-strong disabled:opacity-50";
+const linkBtn = "text-sm font-medium text-brand disabled:opacity-50";
+const dangerLink = "text-sm text-danger disabled:opacity-50";
+
+async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["params"] }) {
+  const { id } = await params;
+  const userId = await getUserId();
+  if (!userId) redirect(`/login?next=/app/events/${id}`);
+  if (!/^[0-9a-f-]{36}$/i.test(id)) notFound();
+
+  const detail = await getEventDetail(id, userId);
+  if (!detail || detail.event.deleted_at) notFound();
+  const { event, myRole, sessions, members, invites } = detail;
+  const canEdit = myRole === "owner" || myRole === "cohost";
+  const isOwner = myRole === "owner";
+  const base = await siteUrl();
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <Link href="/app" className="text-sm text-muted">
+          ← Sự kiện của tôi
+        </Link>
+        <p className="mt-3 text-xs uppercase tracking-wide text-muted">
+          {label(EVENT_TYPES, event.event_type)} · {label(EVENT_STATUS, event.status)}
+          {myRole && ` · Bạn là ${label(EVENT_ROLES, myRole).toLowerCase()}`}
+        </p>
+        {canEdit ? (
+          <ActionForm action={updateEventTitle.bind(null, event.id)} className="mt-1 flex gap-2">
+            <Input name="title" defaultValue={event.title} maxLength={200} className="font-serif text-xl" aria-label="Tên sự kiện" />
+            <SubmitButton className={primaryBtn} pendingText="Đang lưu…">
+              Lưu
+            </SubmitButton>
+          </ActionForm>
+        ) : (
+          <h1 className="mt-1 font-serif text-2xl">{event.title}</h1>
+        )}
+      </div>
+
+      {/* Buổi tiệc */}
+      <Card>
+        <h2 className="font-serif text-lg">Buổi tiệc</h2>
+        <p className="text-sm text-muted">Bàn và check-in được quản lý riêng cho từng buổi.</p>
+        {sessions.length === 0 ? (
+          <p className="mt-4 text-sm text-muted">Chưa có buổi tiệc nào.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-border">
+            {sessions.map((s) => (
+              <li key={s.id} className="flex items-start justify-between gap-3 py-3">
+                <div>
+                  <p className="font-medium">{s.name}</p>
+                  <p className="text-sm text-muted">
+                    {[formatDateTime(s.starts_at), s.venue_name, s.address].filter(Boolean).join(" · ") || "Chưa có thời gian, địa điểm"}
+                  </p>
+                </div>
+                {canEdit && (
+                  <ActionForm action={deleteSession.bind(null, s.id)} confirm={`Xóa buổi "${s.name}"?`}>
+                    <SubmitButton className={dangerLink}>Xóa</SubmitButton>
+                  </ActionForm>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        {canEdit && (
+          <details className="mt-4">
+            <summary className="cursor-pointer text-sm font-medium text-brand">+ Thêm buổi tiệc</summary>
+            <ActionForm action={addSession.bind(null, event.id)} className="mt-3 grid gap-3 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Label htmlFor="name">Tên buổi</Label>
+                <Input id="name" name="name" required maxLength={100} placeholder="Tiệc nhà trai" />
+              </div>
+              <div>
+                <Label htmlFor="startsAt">Thời gian (giờ Việt Nam)</Label>
+                <Input id="startsAt" name="startsAt" type="datetime-local" />
+              </div>
+              <div>
+                <Label htmlFor="venueName">Địa điểm</Label>
+                <Input id="venueName" name="venueName" maxLength={200} placeholder="Nhà hàng …" />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="address">Địa chỉ</Label>
+                <Input id="address" name="address" maxLength={500} />
+              </div>
+              <div>
+                <SubmitButton className={primaryBtn} pendingText="Đang thêm…">
+                  Thêm buổi
+                </SubmitButton>
+              </div>
+            </ActionForm>
+          </details>
+        )}
+      </Card>
+
+      {/* Thành viên */}
+      <Card>
+        <h2 className="font-serif text-lg">Người quản lý</h2>
+        <p className="text-sm text-muted">Đồng tổ chức sửa được mọi thứ; nhân viên chỉ dùng màn check-in.</p>
+        <ul className="mt-4 divide-y divide-border">
+          {members.map((m) => (
+            <li key={m.user_id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+              <span className="font-medium">
+                {m.name}
+                {m.isMe && <span className="text-muted"> (bạn)</span>}
+              </span>
+              {isOwner ? (
+                <div className="flex items-center gap-3">
+                  <ActionForm action={changeMemberRole.bind(null, event.id, m.user_id)} className="flex items-center gap-2">
+                    <Select name="role" defaultValue={m.role} className="w-auto py-1.5 text-sm" aria-label={`Vai trò của ${m.name}`}>
+                      {Object.entries(EVENT_ROLES).map(([k, v]) => (
+                        <option key={k} value={k}>
+                          {v}
+                        </option>
+                      ))}
+                    </Select>
+                    <SubmitButton className={linkBtn}>Đổi</SubmitButton>
+                  </ActionForm>
+                  <ActionForm action={removeMember.bind(null, event.id, m.user_id)} confirm={`Gỡ ${m.name} khỏi sự kiện?`}>
+                    <SubmitButton className={dangerLink}>Gỡ</SubmitButton>
+                  </ActionForm>
+                </div>
+              ) : (
+                <span className="text-sm text-muted">{label(EVENT_ROLES, m.role)}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {isOwner && (
+          <div className="mt-6 border-t border-border pt-4">
+            <h3 className="text-sm font-semibold">Mời người quản lý bằng liên kết</h3>
+            <ActionForm action={createInvite.bind(null, event.id)} className="mt-2 flex flex-wrap items-end gap-2">
+              <div>
+                <Label htmlFor="role">Vai trò</Label>
+                <Select id="role" name="role" defaultValue="staff" className="w-auto">
+                  <option value="cohost">{EVENT_ROLES.cohost}</option>
+                  <option value="staff">{EVENT_ROLES.staff}</option>
+                  <option value="viewer">{EVENT_ROLES.viewer}</option>
+                </Select>
+              </div>
+              <div className="min-w-48 flex-1">
+                <Label htmlFor="note">Ghi chú (để bạn nhớ gửi cho ai)</Label>
+                <Input id="note" name="note" maxLength={200} placeholder="Chị Lan – lễ tân" />
+              </div>
+              <SubmitButton className={primaryBtn} pendingText="Đang tạo…">
+                Tạo liên kết
+              </SubmitButton>
+            </ActionForm>
+
+            {invites.length > 0 && (
+              <ul className="mt-4 space-y-3">
+                {invites.map((inv) => {
+                  const url = `${base}/invite/${inv.token}`;
+                  return (
+                    <li key={inv.id} className="rounded-lg border border-border p-3">
+                      <p className="text-sm">
+                        <strong>{label(EVENT_ROLES, inv.role)}</strong>
+                        {inv.note && ` · ${inv.note}`}
+                        <span className="text-muted"> · hết hạn {formatDateTime(inv.expires_at)}</span>
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <code className="min-w-0 flex-1 truncate rounded bg-background px-2 py-1 text-xs">{url}</code>
+                        <CopyButton text={url} />
+                        <ActionForm action={revokeInvite.bind(null, inv.id)}>
+                          <SubmitButton className={dangerLink}>Thu hồi</SubmitButton>
+                        </ActionForm>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <p className="mt-3 text-xs text-muted">
+              Mỗi liên kết dùng được một lần, hết hạn sau 14 ngày. Gửi qua Zalo cho đúng người.
+            </p>
+          </div>
+        )}
+      </Card>
+
+      {isOwner && (
+        <Card className="border-danger/30">
+          <h2 className="font-serif text-lg">Xóa sự kiện</h2>
+          <p className="text-sm text-muted">Sự kiện vào thùng rác và có thể khôi phục trong 30 ngày.</p>
+          <ActionForm action={trashEvent.bind(null, event.id)} confirm="Đưa sự kiện vào thùng rác?" className="mt-3">
+            <SubmitButton className="rounded-lg border border-danger/30 px-4 py-2 text-sm font-semibold text-danger">
+              Đưa vào thùng rác
+            </SubmitButton>
+          </ActionForm>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+export default function EventPage(props: PageProps<"/app/events/[id]">) {
+  return (
+    <Suspense fallback={<p className="text-sm text-muted">Đang tải…</p>}>
+      <EventDetail params={props.params} />
+    </Suspense>
+  );
+}

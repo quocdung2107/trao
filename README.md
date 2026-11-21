@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TRAO
 
-## Getting Started
+Thiệp mời online + quản lý khách mời, xếp bàn và check-in cho sự kiện.
+Thiết kế: `trao-design/TRAO-thiet-ke-MVP.md` trong thư mục dự án.
 
-First, run the development server:
+## Công nghệ
+
+- Next.js 16 (App Router, Cache Components) + TypeScript + Tailwind CSS 4
+- Supabase: Postgres + RLS, Auth (email OTP / magic link)
+- Schema và phân quyền nằm trong `supabase/migrations/`; test pgTAP trong `supabase/tests/database/`
+
+## Chạy ở máy
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local   # điền URL + publishable key của dự án Supabase
+pnpm dev                     # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Hoặc dùng Supabase cục bộ (cần Docker):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npx supabase start           # in ra API URL và publishable key cục bộ; email xem ở Mailpit
+npx supabase test db         # chạy test pgTAP
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Không có Docker: `DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres pnpm test:db`
+chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng một lớp giả lập tối thiểu
+`scripts/local-supabase-shim.sql`.
 
-## Learn More
+## Quy ước
 
-To learn more about Next.js, take a look at the following resources:
+- Mọi bảng trong `public` bật RLS. Quyền theo sự kiện: `owner`, `cohost`, `staff`, `viewer`
+  (hàm `private.has_event_role`). Khách không đăng nhập không đọc trực tiếp bảng nào.
+- Thao tác cần kiểm tra quyền phức tạp đi qua RPC `security definer` có kiểm tra `auth.uid()` bên trong
+  (`create_event`, `accept_event_invite`, `trash_event`, `restore_event`).
+- Thay đổi schema: thêm file mới trong `supabase/migrations/`, viết test pgTAP đi kèm,
+  sinh lại kiểu: `pnpm db:types` (cần `DATABASE_URL` trỏ tới DB đã áp migration).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Lộ trình
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Giai đoạn | Nội dung | Trạng thái |
+|---|---|---|
+| M0 | Nền móng: đăng nhập, workspace, sự kiện, buổi tiệc, người quản lý, RLS, CI | đang làm |
+| M1 | Mẫu thiệp, trình sửa, xuất bản, ảnh xem trước Zalo | |
+| M2 | Khách mời, nhập Excel, link cá nhân, RSVP | |
+| M3 | Xếp bàn, check-in | |
+| M4 | Hoàn thiện, xuất Excel, thử với sự kiện thật | |
