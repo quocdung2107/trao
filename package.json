@@ -9,7 +9,7 @@
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
     "test:db": "scripts/test-db-local.sh",
-    "db:types": "supabase gen types typescript --db-url \"$DATABASE_URL\" --schema public > src/lib/supabase/database.types.ts"
+    "db:types": "supabase gen types typescript --remote=\"$DATABASE_URL\" --schema public > src/lib/supabase/database.types.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

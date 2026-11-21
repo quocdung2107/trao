@@ -65,6 +65,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"invitations": {
+                  Row: {
+                    "content": NonNullable<Json>,"created_at": string,"created_by": string,"event_id": string,"id": string,"name": string,"published_at": string | null,"session_ids": (string)[] | null,"slug": string,"template_key": string,"template_version": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "content"?: NonNullable<Json>,"created_at"?: string,"created_by"?: string,"event_id": string,"id"?: string,"name"?: string,"published_at"?: string | null,"session_ids"?: (string)[] | null,"slug"?: string,"template_key": string,"template_version"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "content"?: NonNullable<Json>,"created_at"?: string,"created_by"?: string,"event_id"?: string,"id"?: string,"name"?: string,"published_at"?: string | null,"session_ids"?: (string)[] | null,"slug"?: string,"template_key"?: string,"template_version"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "invitations_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"profiles": {
                   Row: {
                     "created_at": string,"display_name": string | null,"id": string
@@ -144,6 +164,9 @@ isOneToOne: false
                            },
 "create_event":
 { Args: { "p_event_type"?: string,"p_first_session_name"?: string,"p_title": string,"p_workspace_id": string }; Returns: string
+                           },
+"get_invitation":
+{ Args: { "p_slug": string }; Returns: Json
                            },
 "restore_event":
 { Args: { "p_event_id": string }; Returns: undefined

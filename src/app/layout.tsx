@@ -14,6 +14,8 @@ const heading = Lora({
 });
 
 export const metadata: Metadata = {
+  // Ảnh xem trước (OG) cần URL tuyệt đối. Không đặt biến thì Next tự suy ra (trên Vercel: domain production).
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
   title: { default: "TRAO", template: "%s · TRAO" },
   description: "Thiệp mời online, quản lý khách mời, xếp bàn và check-in cho sự kiện của bạn.",
 };

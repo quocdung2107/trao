@@ -7,6 +7,9 @@ import { CopyButton } from "@/components/copy-button";
 import { Card, Input, Label, Select } from "@/components/ui";
 import { formatDateTime } from "@/features/events/format";
 import { getEventDetail } from "@/features/events/queries";
+import { createInvitation } from "@/features/invitations/actions";
+import { listInvitations } from "@/features/invitations/queries";
+import { TEMPLATES } from "@/features/invitations/templates/registry";
 import { EVENT_ROLES, EVENT_STATUS, EVENT_TYPES, label } from "@/lib/labels";
 import { siteUrl } from "@/lib/site-url";
 import { getUserId } from "@/lib/supabase/server";
@@ -39,6 +42,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
   const canEdit = myRole === "owner" || myRole === "cohost";
   const isOwner = myRole === "owner";
   const base = await siteUrl();
+  const invitations = await listInvitations(event.id);
 
   return (
     <div className="space-y-6">
@@ -61,6 +65,59 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
           <h1 className="mt-1 font-serif text-2xl">{event.title}</h1>
         )}
       </div>
+
+      {/* Thiệp mời */}
+      <Card>
+        <h2 className="font-serif text-lg">Thiệp mời</h2>
+        <p className="text-sm text-muted">Mỗi thiệp có một link riêng. Có thể làm thiệp riêng cho từng nhà.</p>
+        {invitations.length === 0 ? (
+          <p className="mt-4 text-sm text-muted">Chưa có thiệp nào.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-border">
+            {invitations.map((inv) => {
+              const url = `${base}/${inv.slug}`;
+              return (
+                <li key={inv.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{inv.name}</p>
+                    <p className="text-xs text-muted">
+                      {TEMPLATES.find((t) => t.key === inv.template_key)?.name ?? inv.template_key} ·{" "}
+                      {inv.published_at ? "Đã xuất bản" : "Bản nháp"}
+                    </p>
+                  </div>
+                  {inv.published_at && <CopyButton text={url} label="Chép link" />}
+                  {canEdit && (
+                    <Link href={`/app/events/${event.id}/invitations/${inv.id}`} className={linkBtn}>
+                      Sửa
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        {canEdit && (
+          <ActionForm action={createInvitation.bind(null, event.id)} className="mt-4 flex flex-wrap items-end gap-2">
+            <div className="min-w-40 flex-1">
+              <Label htmlFor="inv-name">Tên thiệp</Label>
+              <Input id="inv-name" name="name" placeholder={invitations.length ? "Thiệp nhà trai" : "Thiệp chính"} maxLength={100} />
+            </div>
+            <div>
+              <Label htmlFor="inv-template">Mẫu</Label>
+              <Select id="inv-template" name="templateKey" defaultValue={TEMPLATES[0].key}>
+                {TEMPLATES.map((t) => (
+                  <option key={t.key} value={t.key}>
+                    {t.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
+            <SubmitButton className={primaryBtn} pendingText="Đang tạo…">
+              Tạo thiệp
+            </SubmitButton>
+          </ActionForm>
+        )}
+      </Card>
 
       {/* Buổi tiệc */}
       <Card>
