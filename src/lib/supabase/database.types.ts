@@ -5,7 +5,21 @@ export type Database = {
   
   "public": {
           Tables: {
-            "consents": {
+            "audit_log": {
+                  Row: {
+                    "action": string,"actor_id": string | null,"after": Json | null,"before": Json | null,"created_at": string,"entity": string,"entity_id": string | null,"event_id": string,"id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"actor_id"?: string | null,"after"?: Json | null,"before"?: Json | null,"created_at"?: string,"entity": string,"entity_id"?: string | null,"event_id": string,"id"?: never
+                  }
+                  Update: {
+                    "action"?: string,"actor_id"?: string | null,"after"?: Json | null,"before"?: Json | null,"created_at"?: string,"entity"?: string,"entity_id"?: string | null,"event_id"?: string,"id"?: never
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"consents": {
                   Row: {
                     "consented_at": string,"event_id": string,"guest_id": string,"id": string,"policy_version": string
                   }
@@ -211,6 +225,38 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"seat_assignments": {
+                  Row: {
+                    "assigned_at": string,"assigned_by": string | null,"event_id": string,"id": string,"seats": number,"session_id": string,"session_invite_id": string,"table_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "assigned_at"?: string,"assigned_by"?: string | null,"event_id": string,"id"?: string,"seats": number,"session_id": string,"session_invite_id": string,"table_id": string
+                  }
+                  Update: {
+                    "assigned_at"?: string,"assigned_by"?: string | null,"event_id"?: string,"id"?: string,"seats"?: number,"session_id"?: string,"session_invite_id"?: string,"table_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "seat_assignments_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "seat_assignments_session_invite_id_session_id_fkey"
+      columns: ["session_invite_id","session_id"]
+isOneToOne: false
+      referencedRelation: "session_invites"
+      referencedColumns: ["id","session_id"]
+    },{
+      foreignKeyName: "seat_assignments_table_id_session_id_fkey"
+      columns: ["table_id","session_id"]
+isOneToOne: false
+      referencedRelation: "tables"
+      referencedColumns: ["id","session_id"]
+    }
+                  ]
                 },"session_invites": {
                   Row: {
                     "attending_count": number | null,"created_at": string,"event_id": string,"guest_id": string,"id": string,"responded_at": string | null,"responded_via": string | null,"rsvp_note": string | null,"rsvp_status": string,"session_id": string
@@ -255,6 +301,26 @@ isOneToOne: false
 isOneToOne: false
       referencedRelation: "events"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"tables": {
+                  Row: {
+                    "capacity": number,"created_at": string,"event_id": string,"id": string,"label": string,"note": string | null,"session_id": string,"sort": number,"zone": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "capacity": number,"created_at"?: string,"event_id": string,"id"?: string,"label": string,"note"?: string | null,"session_id": string,"sort"?: number,"zone"?: string | null
+                  }
+                  Update: {
+                    "capacity"?: number,"created_at"?: string,"event_id"?: string,"id"?: string,"label"?: string,"note"?: string | null,"session_id"?: string,"sort"?: number,"zone"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "tables_session_id_event_id_fkey"
+      columns: ["session_id","event_id"]
+isOneToOne: false
+      referencedRelation: "sessions"
+      referencedColumns: ["id","event_id"]
     }
                   ]
                 },"wishes": {
@@ -331,6 +397,9 @@ isOneToOne: false
           Functions: {
             "accept_event_invite":
 { Args: { "p_token": string }; Returns: string
+                           },
+"assign_seats":
+{ Args: { "p_allow_over"?: boolean,"p_invite_ids": (string)[],"p_table_id": string }; Returns: Json
                            },
 "create_event":
 { Args: { "p_event_type"?: string,"p_first_session_name"?: string,"p_title": string,"p_workspace_id": string }; Returns: string
