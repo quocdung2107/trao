@@ -8,7 +8,7 @@ import { Card, Input, Label, Select } from "@/components/ui";
 import { formatDateTime } from "@/features/events/format";
 import { getEventDetail } from "@/features/events/queries";
 import { createInvitation } from "@/features/invitations/actions";
-import { countGuests } from "@/features/guests/queries";
+import { getEventStats } from "@/features/guests/queries";
 import { listInvitations } from "@/features/invitations/queries";
 import { TEMPLATES } from "@/features/invitations/templates/registry";
 import { EVENT_ROLES, EVENT_STATUS, EVENT_TYPES, label } from "@/lib/labels";
@@ -43,7 +43,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
   const canEdit = myRole === "owner" || myRole === "cohost";
   const isOwner = myRole === "owner";
   const base = await siteUrl();
-  const [invitations, guestCount] = await Promise.all([listInvitations(event.id), canEdit ? countGuests(event.id) : null]);
+  const [invitations, stats] = await Promise.all([listInvitations(event.id), getEventStats(event.id)]);
 
   return (
     <div className="space-y-6">
@@ -120,22 +120,68 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
         )}
       </Card>
 
-      {/* Khách mời */}
-      {guestCount && (
+      {/* Tổng quan khách & trả lời */}
+      {stats && (
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="font-serif text-lg">Khách mời</h2>
-              <p className="text-sm text-muted">
-                {guestCount.guests === 0
-                  ? "Chưa có khách nào. Nhập từ Excel hoặc thêm từng khách."
-                  : `${guestCount.guests} khách · ${guestCount.sent} đã gửi thiệp`}
-              </p>
-            </div>
-            <Link href={`/app/events/${event.id}/guests`} className={primaryBtn}>
-              {guestCount.guests === 0 ? "Thêm khách" : "Xem danh sách"}
-            </Link>
+            <h2 className="font-serif text-lg">Khách mời</h2>
+            {canEdit && (
+              <Link href={`/app/events/${event.id}/guests`} className={primaryBtn}>
+                {stats.guests === 0 ? "Thêm khách" : "Danh sách khách"}
+              </Link>
+            )}
           </div>
+          {stats.guests === 0 ? (
+            <p className="mt-1 text-sm text-muted">Chưa có khách nào. Nhập từ Excel hoặc thêm từng khách.</p>
+          ) : (
+            <>
+              <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
+                <div className="rounded-lg bg-background p-3">
+                  <dt className="text-xs text-muted">Khách</dt>
+                  <dd className="text-2xl font-semibold tabular-nums">{stats.guests}</dd>
+                </div>
+                <div className="rounded-lg bg-background p-3">
+                  <dt className="text-xs text-muted">Tối đa</dt>
+                  <dd className="text-2xl font-semibold tabular-nums">{stats.max_people}</dd>
+                </div>
+                <div className="rounded-lg bg-background p-3">
+                  <dt className="text-xs text-muted">Đã gửi thiệp</dt>
+                  <dd className="text-2xl font-semibold tabular-nums">{stats.sent}</dd>
+                </div>
+              </dl>
+              <ul className="mt-4 space-y-3">
+                {stats.sessions
+                  .filter((s) => s.invited > 0)
+                  .map((s) => {
+                    const answered = s.yes + s.no + s.maybe;
+                    return (
+                      <li key={s.id}>
+                        <div className="flex items-baseline justify-between gap-2 text-sm">
+                          <span className="font-medium">{s.name}</span>
+                          <span className="text-muted">
+                            {answered}/{s.invited} đã trả lời
+                          </span>
+                        </div>
+                        <div className="mt-1 flex h-2 overflow-hidden rounded-full bg-background" aria-hidden>
+                          <div className="bg-brand" style={{ width: `${(s.yes / s.invited) * 100}%` }} />
+                          <div className="bg-accent" style={{ width: `${(s.maybe / s.invited) * 100}%` }} />
+                          <div className="bg-danger/60" style={{ width: `${(s.no / s.invited) * 100}%` }} />
+                        </div>
+                        <p className="mt-1 text-xs text-muted">
+                          <b className="text-brand">{s.attending} người sẽ đến</b> ({s.yes} khách) · {s.maybe} chưa chắc · {s.no}{" "}
+                          không đến · {s.pending} chưa trả lời
+                        </p>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </>
+          )}
+          {stats.wishes > 0 && (
+            <Link href={`/app/events/${event.id}/wishes`} className={`mt-4 inline-block ${linkBtn}`}>
+              Xem {stats.wishes} lời chúc →
+            </Link>
+          )}
         </Card>
       )}
 

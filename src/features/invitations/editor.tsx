@@ -255,6 +255,10 @@ export function InvitationEditor(props: Props) {
               <input type="checkbox" checked={content.showCountdown} onChange={(e) => set("showCountdown", e.target.checked)} />
               Hiện đồng hồ đếm ngược tới buổi đầu tiên
             </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={content.showWishes} onChange={(e) => set("showWishes", e.target.checked)} />
+              Cho khách gửi lời chúc trên thiệp
+            </label>
           </fieldset>
 
           {/* Ảnh */}

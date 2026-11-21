@@ -5,7 +5,27 @@ export type Database = {
   
   "public": {
           Tables: {
-            "event_invites": {
+            "consents": {
+                  Row: {
+                    "consented_at": string,"event_id": string,"guest_id": string,"id": string,"policy_version": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "consented_at"?: string,"event_id": string,"guest_id": string,"id"?: string,"policy_version": string
+                  }
+                  Update: {
+                    "consented_at"?: string,"event_id"?: string,"guest_id"?: string,"id"?: string,"policy_version"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "consents_guest_id_event_id_fkey"
+      columns: ["guest_id","event_id"]
+isOneToOne: false
+      referencedRelation: "guests"
+      referencedColumns: ["id","event_id"]
+    }
+                  ]
+                },"event_invites": {
                   Row: {
                     "accepted_at": string | null,"accepted_by": string | null,"created_at": string,"created_by": string,"event_id": string,"expires_at": string,"id": string,"note": string | null,"revoked_at": string | null,"role": string,"token": string
                   }
@@ -237,6 +257,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"wishes": {
+                  Row: {
+                    "author_name": string,"created_at": string,"event_id": string,"guest_id": string | null,"id": string,"invitation_id": string,"message": string,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_name": string,"created_at"?: string,"event_id": string,"guest_id"?: string | null,"id"?: string,"invitation_id": string,"message": string,"status"?: string
+                  }
+                  Update: {
+                    "author_name"?: string,"created_at"?: string,"event_id"?: string,"guest_id"?: string | null,"id"?: string,"invitation_id"?: string,"message"?: string,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "wishes_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishes_guest_id_fkey"
+      columns: ["guest_id"]
+isOneToOne: false
+      referencedRelation: "guests"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "wishes_invitation_id_fkey"
+      columns: ["invitation_id"]
+isOneToOne: false
+      referencedRelation: "invitations"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"workspace_members": {
                   Row: {
                     "created_at": string,"role": string,"user_id": string,"workspace_id": string
@@ -283,14 +335,26 @@ isOneToOne: false
 "create_event":
 { Args: { "p_event_type"?: string,"p_first_session_name"?: string,"p_title": string,"p_workspace_id": string }; Returns: string
                            },
+"event_stats":
+{ Args: { "p_event_id": string }; Returns: Json
+                           },
+"get_guest_invitation":
+{ Args: { "p_slug": string,"p_token": string }; Returns: Json
+                           },
 "get_invitation":
 { Args: { "p_slug": string }; Returns: Json
                            },
 "import_guests":
 { Args: { "p_event_id": string,"p_file_name": string,"p_rows": Json,"p_session_ids"?: (string)[] }; Returns: Json
                            },
+"post_wish":
+{ Args: { "p_message": string,"p_name": string,"p_slug": string,"p_token"?: string }; Returns: undefined
+                           },
 "restore_event":
 { Args: { "p_event_id": string }; Returns: undefined
+                           },
+"submit_rsvp":
+{ Args: { "p_consent_version"?: string,"p_note"?: string,"p_responses": Json,"p_slug": string,"p_token": string }; Returns: Json
                            },
 "trash_event":
 { Args: { "p_event_id": string }; Returns: undefined

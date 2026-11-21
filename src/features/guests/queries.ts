@@ -51,7 +51,7 @@ export async function getGuest(guestId: string) {
   const { data } = await supabase
     .from("guests")
     .select(
-      "id, event_id, display_name, salutation, phone_e164, email, side, max_party_size, notes, deleted_at, guest_group_links(group_id), session_invites(session_id)",
+      "id, event_id, display_name, salutation, phone_e164, email, side, max_party_size, notes, deleted_at, guest_group_links(group_id), session_invites(session_id, rsvp_status, attending_count, rsvp_note, responded_via, responded_at)",
     )
     .eq("id", guestId)
     .maybeSingle();
@@ -77,10 +77,27 @@ export async function listGuestPhones(eventId: string) {
   return (data ?? []).map((g) => g.phone_e164!);
 }
 
-export async function countGuests(eventId: string) {
+export type EventStats = {
+  guests: number;
+  max_people: number;
+  sent: number;
+  wishes: number;
+  sessions: { id: string; name: string; invited: number; yes: number; no: number; maybe: number; pending: number; attending: number }[];
+};
+
+export async function getEventStats(eventId: string) {
   const supabase = await createClient();
-  const base = () =>
-    supabase.from("guests").select("id", { count: "exact", head: true }).eq("event_id", eventId).is("deleted_at", null);
-  const [{ count: guests }, { count: sent }] = await Promise.all([base(), base().not("invite_sent_at", "is", null)]);
-  return { guests: guests ?? 0, sent: sent ?? 0 };
+  const { data } = await supabase.rpc("event_stats", { p_event_id: eventId });
+  return (data as unknown as EventStats | null) ?? null;
+}
+
+export async function listWishes(eventId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("wishes")
+    .select("id, author_name, message, status, created_at, guest_id, invitations(name)")
+    .eq("event_id", eventId)
+    .order("created_at", { ascending: false })
+    .limit(500);
+  return data ?? [];
 }

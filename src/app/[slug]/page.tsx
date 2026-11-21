@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { getPublishedInvitation } from "@/features/invitations/public";
+import { getGuestInvitation, getPublishedInvitation, isGuestToken } from "@/features/invitations/public";
+import { RsvpForm } from "@/features/rsvp/rsvp-form";
+import { Wishes } from "@/features/rsvp/wishes";
 import { InvitationTemplate } from "@/features/invitations/templates/registry";
 import { sessionDate, firstStart } from "@/features/invitations/view";
 
@@ -22,14 +24,25 @@ export async function generateMetadata({ params }: PageProps<"/[slug]">): Promis
   };
 }
 
-async function Invitation({ params }: { params: PageProps<"/[slug]">["params"] }) {
-  const { slug } = await params;
+async function Invitation({ props }: { props: PageProps<"/[slug]"> }) {
+  const [{ slug }, { g }] = await Promise.all([props.params, props.searchParams]);
   const inv = await getPublishedInvitation(slug);
   if (!inv) notFound();
+  // Link cá nhân ?g=<token>: thiệp gọi đích danh, chỉ hiện các buổi khách được mời, kèm RSVP.
+  const token = isGuestToken(g) ? g : null;
+  const guest = token ? await getGuestInvitation(slug, token) : null;
+  const view = guest?.invites.length ? { ...inv, sessions: guest.invites.map((i) => ({ ...i, id: i.session_id })) } : inv;
   return (
     <InvitationTemplate
       templateKey={inv.template_key}
-      view={inv}
+      view={view}
+      greeting={guest?.salutation}
+      rsvp={guest && token ? <RsvpForm slug={slug} token={token} guest={guest} /> : null}
+      wishes={
+        inv.content.showWishes ? (
+          <Wishes slug={slug} token={guest ? token : null} wishes={inv.wishes} defaultName={guest?.salutation} />
+        ) : null
+      }
       footer={
         <footer className="px-6 pt-4 pb-10 text-center text-xs opacity-60">
           Thiệp tạo bằng{" "}
@@ -46,7 +59,7 @@ export default function InvitationPage(props: PageProps<"/[slug]">) {
   return (
     <main className="flex flex-1 flex-col">
       <Suspense fallback={<div className="flex-1" />}>
-        <Invitation params={props.params} />
+        <Invitation props={props} />
       </Suspense>
     </main>
   );

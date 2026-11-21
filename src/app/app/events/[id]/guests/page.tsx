@@ -8,6 +8,8 @@ import { GuestList } from "@/features/guests/guest-list";
 import { getEventForGuests, listGuests } from "@/features/guests/queries";
 import { siteUrl } from "@/lib/site-url";
 import { getUserId } from "@/lib/supabase/server";
+import { Input } from "@/components/ui";
+import { setRsvpDeadline } from "@/features/rsvp/host-actions";
 
 export const metadata: Metadata = { title: "Khách mời" };
 
@@ -25,7 +27,8 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
 
   const [{ guests, groups, invitations, recentImports }, base] = await Promise.all([listGuests(id), siteUrl()]);
   const people = guests.reduce((n, g) => n + g.max_party_size, 0);
-  const settings = (ctx.event.settings ?? {}) as { inviteMessage?: string };
+  const settings = (ctx.event.settings ?? {}) as { inviteMessage?: string; rsvpDeadline?: string };
+  const deadline = settings.rsvpDeadline ? settings.rsvpDeadline.slice(0, 10) : "";
 
   return (
     <div className="space-y-5">
@@ -84,6 +87,17 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
           inviteMessage={settings.inviteMessage ?? null}
         />
       )}
+
+      <ActionForm action={setRsvpDeadline.bind(null, id)} className="flex flex-wrap items-end gap-2 text-sm">
+        <label>
+          <span className="mb-1 block font-medium">Hạn trả lời</span>
+          <Input type="date" name="deadline" defaultValue={deadline} className="w-auto" />
+        </label>
+        <SubmitButton className={ghostBtn} pendingText="Đang lưu…">
+          Lưu hạn
+        </SubmitButton>
+        <span className="pb-2.5 text-xs text-muted">{deadline ? "Sau ngày này khách không tự sửa câu trả lời được." : "Chưa đặt hạn."}</span>
+      </ActionForm>
 
       {groups.length > 0 && (
         <details className="text-sm">
