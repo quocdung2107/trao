@@ -9,13 +9,21 @@ import { getUserId } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Lịch sử thay đổi" };
 
-type Info = { table?: string | null; guest?: string | null; seats?: number; session?: string | null } | null;
+type Info = {
+  table?: string | null;
+  guest?: string | null;
+  seats?: number;
+  count?: number;
+  reason?: string | null;
+  session?: string | null;
+} | null;
 
 function describe(action: string, before: Info, after: Info) {
   const who = (after ?? before)?.guest ?? "Khách đã xóa";
   if (action === "seat.assign") return `Xếp ${who} vào ${after?.table ?? "bàn"} (${after?.seats} chỗ)`;
   if (action === "seat.unassign") return before?.table ? `Bỏ ${who} khỏi ${before.table}` : `Bỏ ${who} khỏi bàn đã xóa`;
   if (action === "table.delete") return `Xóa ${before?.table}`;
+  if (action === "checkin.void") return `Hủy check-in của ${who} (${before?.count} người)${before?.reason ? `: ${before.reason}` : ""}`;
   return action;
 }
 
@@ -36,7 +44,7 @@ async function History({ params }: { params: PageProps<"/app/events/[id]/history
           ← Xếp bàn
         </Link>
         <h1 className="mt-2 font-serif text-2xl">Lịch sử thay đổi</h1>
-        <p className="text-sm text-muted">300 thay đổi gần nhất về xếp bàn.</p>
+        <p className="text-sm text-muted">300 thay đổi gần nhất về xếp bàn và hủy check-in.</p>
       </div>
       {rows.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted">Chưa có thay đổi nào.</p>

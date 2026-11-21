@@ -19,6 +19,32 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"checkins": {
+                  Row: {
+                    "arrived_count": number,"client_at": string | null,"device_id": string | null,"event_id": string,"id": string,"method": string,"note": string | null,"performed_by": string | null,"server_at": string,"session_id": string,"session_invite_id": string,"status": string,"voided_at": string | null,"voided_by": string | null,"voided_reason": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "arrived_count": number,"client_at"?: string | null,"device_id"?: string | null,"event_id": string,"id": string,"method": string,"note"?: string | null,"performed_by"?: string | null,"server_at"?: string,"session_id": string,"session_invite_id": string,"status": string,"voided_at"?: string | null,"voided_by"?: string | null,"voided_reason"?: string | null
+                  }
+                  Update: {
+                    "arrived_count"?: number,"client_at"?: string | null,"device_id"?: string | null,"event_id"?: string,"id"?: string,"method"?: string,"note"?: string | null,"performed_by"?: string | null,"server_at"?: string,"session_id"?: string,"session_invite_id"?: string,"status"?: string,"voided_at"?: string | null,"voided_by"?: string | null,"voided_reason"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "checkins_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "checkins_session_invite_id_session_id_fkey"
+      columns: ["session_invite_id","session_id"]
+isOneToOne: false
+      referencedRelation: "session_invites"
+      referencedColumns: ["id","session_id"]
+    }
+                  ]
                 },"consents": {
                   Row: {
                     "consented_at": string,"event_id": string,"guest_id": string,"id": string,"policy_version": string
@@ -401,6 +427,18 @@ isOneToOne: false
 "assign_seats":
 { Args: { "p_allow_over"?: boolean,"p_invite_ids": (string)[],"p_table_id": string }; Returns: Json
                            },
+"checkin":
+{ Args: { "p_arrived": number,"p_client_at"?: string,"p_device_id"?: string,"p_id": string,"p_invite_id": string,"p_method"?: string,"p_note"?: string }; Returns: Json
+                           },
+"checkin_find":
+{ Args: { "p_query"?: string,"p_session_id": string,"p_token"?: string }; Returns: Json
+                           },
+"checkin_summary":
+{ Args: { "p_session_id": string }; Returns: Json
+                           },
+"checkin_void":
+{ Args: { "p_checkin_id": string,"p_reason"?: string }; Returns: undefined
+                           },
 "create_event":
 { Args: { "p_event_type"?: string,"p_first_session_name"?: string,"p_title": string,"p_workspace_id": string }; Returns: string
                            },
@@ -409,6 +447,9 @@ isOneToOne: false
                            },
 "get_guest_invitation":
 { Args: { "p_slug": string,"p_token": string }; Returns: Json
+                           },
+"get_guest_pass":
+{ Args: { "p_token": string }; Returns: Json
                            },
 "get_invitation":
 { Args: { "p_slug": string }; Returns: Json
