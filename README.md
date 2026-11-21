@@ -26,7 +26,7 @@ npx supabase test db         # chạy test pgTAP
 
 Không có Docker: `DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres pnpm test:db`
 chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng một lớp giả lập tối thiểu
-`supabase/tests/local-shim.sql`.
+`scripts/local-supabase-shim.sql`.
 
 ## Quy ước
 

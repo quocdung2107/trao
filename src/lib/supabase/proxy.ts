@@ -29,10 +29,8 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   if (!data?.claims && PROTECTED_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`))) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-    url.search = `?next=${encodeURIComponent(path + request.nextUrl.search)}`;
-    return NextResponse.redirect(url);
+    const origin = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || request.nextUrl.origin;
+    return NextResponse.redirect(`${origin}/login?next=${encodeURIComponent(path + request.nextUrl.search)}`);
   }
 
   return response;

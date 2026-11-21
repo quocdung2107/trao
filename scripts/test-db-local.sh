@@ -9,7 +9,7 @@ psql "$ADMIN_URL" -qc "create database $DB" >/dev/null
 trap 'psql "$ADMIN_URL" -qc "drop database if exists $DB" >/dev/null' EXIT
 URL="${ADMIN_URL%/*}/$DB"
 PSQL=(psql "$URL" -v ON_ERROR_STOP=1 -q)
-"${PSQL[@]}" -f "$ROOT/supabase/tests/local-shim.sql" >/dev/null
+"${PSQL[@]}" -f "$ROOT/scripts/local-supabase-shim.sql" >/dev/null
 for f in "$ROOT"/supabase/migrations/*.sql; do "${PSQL[@]}" -f "$f" >/dev/null; done
 "${PSQL[@]}" -c "create extension if not exists pgtap with schema extensions" >/dev/null
 status=0

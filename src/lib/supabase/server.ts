@@ -1,8 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { connection } from "next/server";
 import type { Database } from "./database.types";
 
 export async function createClient() {
+  // Dữ liệu theo người dùng luôn render lúc request (supabase-js dùng Date.now() khi kiểm JWT).
+  await connection();
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
