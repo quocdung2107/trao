@@ -25,6 +25,7 @@ function describe(action: string, before: Info, after: Info) {
   if (action === "seat.unassign") return before?.table ? `Bỏ ${who} khỏi ${before.table}` : `Bỏ ${who} khỏi bàn đã xóa`;
   if (action === "table.delete") return `Xóa ${before?.table}`;
   if (action === "export") return `Xuất Excel danh sách ${after?.guests ?? ""} khách`;
+  if (action === "guest.erase") return "Một khách đã tự xóa thông tin của mình";
   if (action === "checkin.void") return `Hủy check-in của ${who} (${before?.count} người)${before?.reason ? `: ${before.reason}` : ""}`;
   return action;
 }
@@ -46,7 +47,7 @@ async function History({ params }: { params: PageProps<"/app/events/[id]/history
           ← Xếp bàn
         </Link>
         <h1 className="mt-2 font-serif text-2xl">Lịch sử thay đổi</h1>
-        <p className="text-sm text-muted">300 thay đổi gần nhất về xếp bàn, hủy check-in và xuất dữ liệu.</p>
+        <p className="text-sm text-muted">300 thay đổi gần nhất về xếp bàn, hủy check-in, xuất dữ liệu và khách tự xóa thông tin.</p>
       </div>
       {rows.length === 0 ? (
         <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted">Chưa có thay đổi nào.</p>

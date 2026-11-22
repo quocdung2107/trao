@@ -457,6 +457,12 @@ isOneToOne: false
 "get_invitation":
 { Args: { "p_slug": string }; Returns: Json
                            },
+"guest_erase":
+{ Args: { "p_token": string }; Returns: Json
+                           },
+"guest_privacy_view":
+{ Args: { "p_token": string }; Returns: Json
+                           },
 "import_guests":
 { Args: { "p_event_id": string,"p_file_name": string,"p_rows": Json,"p_session_ids"?: (string)[] }; Returns: Json
                            },
