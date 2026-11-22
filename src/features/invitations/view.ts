@@ -17,6 +17,11 @@ export type InvitationView = {
   sessions: InvitationSession[];
 };
 
+/** Thiệp "Lời chúc" không có tiệc: bỏ các buổi để mẫu tự ẩn khối buổi tiệc, bản đồ, đếm ngược. */
+export function withoutPartyIfGreeting<V extends InvitationView>(view: V): V {
+  return view.event.event_type === "greeting" ? { ...view, sessions: [] } : view;
+}
+
 export function mediaUrl(path: string) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/event-media/${path}`;
 }
@@ -37,6 +42,11 @@ export function sessionDate(iso: string | null) {
     weekday: new Intl.DateTimeFormat("vi-VN", { timeZone: TZ, weekday: "long" }).format(d),
     date: new Intl.DateTimeFormat("vi-VN", { timeZone: TZ, day: "2-digit", month: "2-digit", year: "numeric" }).format(d),
   };
+}
+
+/** Mốc thời gian đã qua chưa (hạn trả lời…). */
+export function isPast(iso: string | null) {
+  return Boolean(iso && new Date(iso).getTime() < Date.now());
 }
 
 /** Buổi sớm nhất có thời gian, dùng cho đếm ngược. */

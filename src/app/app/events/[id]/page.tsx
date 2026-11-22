@@ -11,7 +11,7 @@ import { createInvitation } from "@/features/invitations/actions";
 import { getEventStats } from "@/features/guests/queries";
 import { listInvitations } from "@/features/invitations/queries";
 import { TEMPLATES } from "@/features/invitations/templates/registry";
-import { EVENT_ROLES, EVENT_STATUS, EVENT_TYPES, label } from "@/lib/labels";
+import { EVENT_ROLES, EVENT_STATUS, EVENT_TYPES, hasParty, label } from "@/lib/labels";
 import { siteUrl } from "@/lib/site-url";
 import { getUserId } from "@/lib/supabase/server";
 import {
@@ -42,6 +42,8 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
   const { event, myRole, sessions, members, invites } = detail;
   const canEdit = myRole === "owner" || myRole === "cohost";
   const isOwner = myRole === "owner";
+  const party = hasParty(event.event_type);
+  const openRsvp = (event.settings as { openRsvp?: boolean } | null)?.openRsvp === true;
   const base = await siteUrl();
   const [invitations, stats] = await Promise.all([listInvitations(event.id), getEventStats(event.id)]);
 
@@ -67,7 +69,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
         )}
       </div>
 
-      {myRole && myRole !== "viewer" && sessions.length > 0 && (
+      {party && myRole && myRole !== "viewer" && sessions.length > 0 && (
         <Card className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-serif text-lg">Check-in tại sảnh</h2>
@@ -82,7 +84,13 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
       {/* Thiệp mời */}
       <Card>
         <h2 className="font-serif text-lg">Thiệp mời</h2>
-        <p className="text-sm text-muted">Mỗi thiệp có một link riêng. Có thể làm thiệp riêng cho từng nhà.</p>
+        <p className="text-sm text-muted">
+          {!party
+            ? "Gửi link chung cho mọi người, hoặc link có tên từng người trong danh sách người nhận."
+            : openRsvp
+              ? "Ai có link chung đều đăng ký tham dự được; bạn duyệt trong mục Chờ duyệt. Khách có link riêng thì trả lời ngay."
+              : "Link chung để xem thiệp và gửi lời chúc. Khách xác nhận tham dự qua link riêng trong danh sách khách, hoặc bạn bật đăng ký qua link chung."}
+        </p>
         {invitations.length === 0 ? (
           <p className="mt-4 text-sm text-muted">Chưa có thiệp nào.</p>
         ) : (
@@ -136,15 +144,30 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
       {stats && (
         <Card>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-serif text-lg">Khách mời</h2>
+            <h2 className="font-serif text-lg">{party ? "Khách mời" : "Người nhận"}</h2>
             {canEdit && (
               <Link href={`/app/events/${event.id}/guests`} className={primaryBtn}>
-                {stats.guests === 0 ? "Thêm khách" : "Danh sách khách"}
+                {stats.guests === 0 ? (party ? "Thêm khách" : "Thêm người nhận") : party ? "Danh sách khách" : "Danh sách người nhận"}
               </Link>
             )}
           </div>
+          {canEdit && stats.requests_pending > 0 && (
+            <Link
+              href={`/app/events/${event.id}/guests/requests`}
+              className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm"
+            >
+              <span>
+                <b>{stats.requests_pending} người</b> đăng ký qua link chung đang chờ bạn duyệt
+              </span>
+              <span className="font-semibold text-brand">Xem →</span>
+            </Link>
+          )}
           {stats.guests === 0 ? (
-            <p className="mt-1 text-sm text-muted">Chưa có khách nào. Nhập từ Excel hoặc thêm từng khách.</p>
+            <p className="mt-1 text-sm text-muted">
+              {party
+                ? "Chưa có khách nào. Nhập từ Excel hoặc thêm từng khách."
+                : "Không bắt buộc. Thêm người nhận nếu muốn gửi link có tên từng người (“Thân gửi cô Lan”)."}
+            </p>
           ) : (
             <>
               <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
@@ -210,7 +233,8 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
         </Card>
       )}
 
-      {/* Buổi tiệc */}
+      {/* Buổi tiệc (Lời chúc không có tiệc) */}
+      {party && (
       <Card>
         <h2 className="font-serif text-lg">Buổi tiệc</h2>
         <p className="text-sm text-muted">Bàn và check-in được quản lý riêng cho từng buổi.</p>
@@ -269,6 +293,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
           </details>
         )}
       </Card>
+      )}
 
       {/* Thành viên */}
       <Card>
