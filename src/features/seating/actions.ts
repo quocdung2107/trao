@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { ActionState } from "@/app/app/events/actions";
 import { dbErrorMessage } from "@/features/events/errors";
+import type { Json } from "@/lib/supabase/database.types";
 import { createClient, getUserId } from "@/lib/supabase/server";
 
 const uuid = z.uuid();
@@ -128,4 +129,20 @@ export async function unassignSeats(inviteIds: string[]): Promise<{ error?: stri
   if (error) return { error: dbErrorMessage(error)! };
   refresh();
   return {};
+}
+
+// ---------------------------------------------------------------- hiện số bàn cho khách
+
+export async function setShowTableToGuest(eventId: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
+  await requireUser();
+  if (!uuid.safeParse(eventId).success) return { error: "Sự kiện không hợp lệ." };
+  const show = formData.get("show") === "on";
+  const supabase = await createClient();
+  const { data: ev } = await supabase.from("events").select("settings").eq("id", eventId).maybeSingle();
+  if (!ev) return { error: "Không tìm thấy sự kiện." };
+  const settings = { ...((ev.settings as Record<string, Json>) ?? {}), showTableToGuest: show };
+  const { data, error } = await supabase.from("events").update({ settings }).eq("id", eventId).select("id");
+  if (error || !data?.length) return { error: dbErrorMessage(error, "Bạn không có quyền đổi cài đặt này.") };
+  refresh();
+  return { ok: true };
 }

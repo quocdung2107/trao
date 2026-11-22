@@ -48,7 +48,7 @@ chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng m�
 | M0 | Nền móng: đăng nhập, workspace, sự kiện, buổi tiệc, người quản lý, RLS, CI | xong |
 | M1 | Mẫu thiệp, trình sửa, xuất bản, ảnh xem trước Zalo | xong |
 | M2 | Khách mời, nhập Excel, link cá nhân, RSVP, lời chúc | xong |
-| M3 | Xếp bàn, lịch sử đổi bàn (M3a, xong); check-in, QR (M3b) | đang làm |
+| M3 | Xếp bàn, lịch sử đổi bàn, check-in tại sảnh, thẻ vào tiệc có QR | xong |
 | M4 | Hoàn thiện, xuất Excel, thử với sự kiện thật | |
 
 ## Triển khai

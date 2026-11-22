@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { ActionForm, SubmitButton } from "@/components/action-form";
 import { Card, Input, Label } from "@/components/ui";
 import { getEventForGuests } from "@/features/guests/queries";
-import { createTables } from "@/features/seating/actions";
+import { createTables, setShowTableToGuest } from "@/features/seating/actions";
 import { getSeating } from "@/features/seating/queries";
 import { SeatingBoard } from "@/features/seating/seating-board";
 import { getUserId } from "@/lib/supabase/server";
@@ -28,6 +28,7 @@ async function Seating({ params, searchParams }: PageProps<"/app/events/[id]/sea
   const session = ctx.sessions.find((x) => x.id === s) ?? ctx.sessions[0];
   const data = await getSeating(id, session.id);
   const capacity = data.tables.reduce((n, t) => n + t.capacity, 0);
+  const showTable = (ctx.event.settings as { showTableToGuest?: boolean } | null)?.showTableToGuest === true;
 
   return (
     <div className="space-y-5">
@@ -91,6 +92,16 @@ async function Seating({ params, searchParams }: PageProps<"/app/events/[id]/sea
           <p className="mt-2 text-xs text-muted">Bàn được đánh số nối tiếp, ví dụ Bàn 1 đến Bàn 30. Đổi tên hoặc sức chứa từng bàn sau.</p>
         </details>
       </Card>
+
+      <ActionForm action={setShowTableToGuest.bind(null, id)} className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+        <label className="flex flex-1 items-center gap-2 text-sm">
+          <input type="checkbox" name="show" defaultChecked={showTable} className="size-5 accent-brand" />
+          Cho khách xem số bàn trên thẻ vào tiệc
+        </label>
+        <SubmitButton className="text-sm font-medium text-brand" pendingText="Đang lưu…">
+          Lưu
+        </SubmitButton>
+      </ActionForm>
 
       <SeatingBoard key={session.id} data={data} />
     </div>

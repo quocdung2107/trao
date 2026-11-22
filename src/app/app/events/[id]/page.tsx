@@ -67,6 +67,18 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
         )}
       </div>
 
+      {myRole && myRole !== "viewer" && sessions.length > 0 && (
+        <Card className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-serif text-lg">Check-in tại sảnh</h2>
+            <p className="text-sm text-muted">Quét mã QR hoặc tìm tên khách, xem ngay số bàn.</p>
+          </div>
+          <Link href={`/app/events/${event.id}/checkin`} className={primaryBtn}>
+            Mở màn check-in
+          </Link>
+        </Card>
+      )}
+
       {/* Thiệp mời */}
       <Card>
         <h2 className="font-serif text-lg">Thiệp mời</h2>
@@ -176,6 +188,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
                             Đã xếp bàn {s.seated}/{s.to_seat} khách · {s.tables} bàn
                           </p>
                         )}
+                        {s.arrived > 0 && <p className="text-xs font-semibold text-brand">Đã đến {s.arrived} khách</p>}
                       </li>
                     );
                   })}

@@ -37,7 +37,18 @@ async function Invitation({ props }: { props: PageProps<"/[slug]"> }) {
       templateKey={inv.template_key}
       view={view}
       greeting={guest?.salutation}
-      rsvp={guest && token ? <RsvpForm slug={slug} token={token} guest={guest} /> : null}
+      rsvp={
+        guest && token ? (
+          <>
+            <RsvpForm slug={slug} token={token} guest={guest} />
+            <p className="mt-3 text-center text-sm">
+              <Link href={`/c/${token}`} className="font-semibold underline" style={{ color: "var(--inv-accent)" }}>
+                Thẻ vào tiệc (mã QR)
+              </Link>
+            </p>
+          </>
+        ) : null
+      }
       wishes={
         inv.content.showWishes ? (
           <Wishes slug={slug} token={guest ? token : null} wishes={inv.wishes} defaultName={guest?.salutation} />
