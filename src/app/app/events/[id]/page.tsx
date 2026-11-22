@@ -106,7 +106,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
                       {inv.published_at ? "Đã xuất bản" : "Bản nháp"}
                     </p>
                   </div>
-                  {inv.published_at && <CopyButton text={url} label="Chép link" />}
+                  {inv.published_at && <CopyButton text={url} label="Chép link chung" />}
                   {canEdit && (
                     <Link href={`/app/events/${event.id}/invitations/${inv.id}`} className={linkBtn}>
                       Sửa

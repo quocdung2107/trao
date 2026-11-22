@@ -59,6 +59,10 @@ async function Invitation({ props }: { props: PageProps<"/[slug]"> }) {
             deadline={inv.rsvp_deadline}
             closed={isPast(inv.rsvp_deadline)}
           />
+        ) : party ? (
+          <p className="text-center text-sm opacity-70">
+            Để xác nhận tham dự, hãy mở link riêng mà chủ tiệc gửi cho bạn.
+          </p>
         ) : null
       }
       wishes={
