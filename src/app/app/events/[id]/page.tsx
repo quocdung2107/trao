@@ -82,7 +82,14 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
       {/* Thiệp mời */}
       <Card>
         <h2 className="font-serif text-lg">Thiệp mời</h2>
-        <p className="text-sm text-muted">Mỗi thiệp có một link riêng. Có thể làm thiệp riêng cho từng nhà.</p>
+        <p className="text-sm text-muted">
+          Link chung chỉ để xem thiệp và gửi lời chúc. Để khách xác nhận tham dự và nhận mã QR vào tiệc, hãy gửi{" "}
+          <b>link riêng của từng khách</b> trong{" "}
+          <Link href={`/app/events/${event.id}/guests`} className="underline">
+            danh sách khách
+          </Link>
+          .
+        </p>
         {invitations.length === 0 ? (
           <p className="mt-4 text-sm text-muted">Chưa có thiệp nào.</p>
         ) : (
@@ -98,7 +105,7 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
                       {inv.published_at ? "Đã xuất bản" : "Bản nháp"}
                     </p>
                   </div>
-                  {inv.published_at && <CopyButton text={url} label="Chép link" />}
+                  {inv.published_at && <CopyButton text={url} label="Chép link chung" />}
                   {canEdit && (
                     <Link href={`/app/events/${event.id}/invitations/${inv.id}`} className={linkBtn}>
                       Sửa

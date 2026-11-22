@@ -47,7 +47,11 @@ async function Invitation({ props }: { props: PageProps<"/[slug]"> }) {
               </Link>
             </p>
           </>
-        ) : null
+        ) : (
+          <p className="text-center text-sm opacity-70">
+            Để xác nhận tham dự, hãy mở link riêng mà chủ tiệc gửi cho bạn.
+          </p>
+        )
       }
       wishes={
         inv.content.showWishes ? (
