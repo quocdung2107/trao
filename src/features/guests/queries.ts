@@ -82,6 +82,7 @@ export type EventStats = {
   max_people: number;
   sent: number;
   wishes: number;
+  requests_pending: number;
   sessions: { id: string; name: string; invited: number; yes: number; no: number; maybe: number; pending: number; attending: number;
     seated: number; to_seat: number; tables: number; arrived: number }[];
 };
@@ -123,5 +124,34 @@ export async function countTrashedGuests(eventId: string) {
     .select("id", { count: "exact", head: true })
     .eq("event_id", eventId)
     .not("deleted_at", "is", null);
+  return count ?? 0;
+}
+
+/** Đăng ký qua link chung: đang chờ (cũ trước) và 50 bản đã xử lý gần nhất. */
+export async function listRsvpRequests(eventId: string) {
+  const supabase = await createClient();
+  const cols = "id, name, phone_e164, party_size, session_ids, note, status, guest_id, created_at, decided_at, invitations(name)";
+  const [{ data: pending }, { data: decided }] = await Promise.all([
+    supabase.from("rsvp_requests").select(cols).eq("event_id", eventId).eq("status", "pending").order("created_at").limit(1000),
+    supabase
+      .from("rsvp_requests")
+      .select(cols)
+      .eq("event_id", eventId)
+      .neq("status", "pending")
+      .order("decided_at", { ascending: false })
+      .limit(50),
+  ]);
+  return { pending: pending ?? [], decided: decided ?? [] };
+}
+
+export type RsvpRequestRow = Awaited<ReturnType<typeof listRsvpRequests>>["pending"][number];
+
+export async function countPendingRequests(eventId: string) {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("rsvp_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", eventId)
+    .eq("status", "pending");
   return count ?? 0;
 }

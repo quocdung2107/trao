@@ -36,6 +36,7 @@ export function parseContent(raw: unknown): InvitationContent {
   return invitationContentSchema.parse({});
 }
 
+/** Nội dung mặc định khi tạo thiệp, theo loại sự kiện. Chủ tiệc sửa lại trong trình sửa. */
 export function defaultContent(eventType: EventType, eventTitle: string): InvitationContent {
   const base = invitationContentSchema.parse({});
   switch (eventType) {
@@ -61,6 +62,43 @@ export function defaultContent(eventType: EventType, eventTitle: string): Invita
         message: "Rất mong bạn đến chung vui cùng gia đình.",
         closing: "Hẹn gặp bạn nhé!",
       };
+    case "family":
+      return {
+        ...base,
+        heading: "Thân mời",
+        title: eventTitle,
+        subtitle: "Tiệc gia đình",
+        message: "Gia đình chúng tôi trân trọng kính mời quý khách đến dùng bữa cơm thân mật.",
+        closing: "Rất mong được đón tiếp quý khách.",
+      };
+    case "christmas":
+      return {
+        ...base,
+        heading: "Thân mời",
+        title: eventTitle,
+        subtitle: "Tiệc Giáng sinh",
+        message: "Mời bạn cùng đón Giáng sinh với chúng tôi: một buổi tối ấm áp, nhiều tiếng cười và những món quà nhỏ.",
+        closing: "Giáng sinh an lành!",
+      };
+    case "corporate":
+      return {
+        ...base,
+        title: eventTitle,
+        subtitle: "Sự kiện",
+        message: "Trân trọng kính mời Quý khách đến tham dự sự kiện của chúng tôi.",
+        closing: "Rất hân hạnh được đón tiếp Quý khách.",
+      };
+    case "greeting":
+      // Thiệp chúc, không có tiệc: không có buổi nên không có đếm ngược.
+      return {
+        ...base,
+        heading: "Thân gửi",
+        title: eventTitle,
+        subtitle: "Mùa lễ an lành",
+        message: "Chúc bạn và gia đình một mùa lễ bình an, ấm áp và tràn đầy yêu thương.",
+        closing: "Thân mến!",
+        showCountdown: false,
+      };
     default:
       return {
         ...base,
@@ -69,4 +107,22 @@ export function defaultContent(eventType: EventType, eventTitle: string): Invita
         closing: "Rất hân hạnh được đón tiếp.",
       };
   }
+}
+
+/** Gợi ý (placeholder) cho các ô trong trình sửa, theo loại sự kiện. */
+export type ContentHints = { title: string; subtitle: string; personLabel: string; personDetail: string };
+
+const HINTS: Record<EventType, ContentHints> = {
+  wedding: { title: "An & Bình", subtitle: "Lễ thành hôn", personLabel: "Chú rể", personDetail: "Con ông … và bà … (không bắt buộc)" },
+  birthday: { title: "Sinh nhật Minh", subtitle: "Tiệc sinh nhật", personLabel: "Nhân vật chính", personDetail: "Không bắt buộc" },
+  first_birthday: { title: "Bé Na", subtitle: "Mừng bé tròn một tuổi", personLabel: "Bé", personDetail: "Con của … (không bắt buộc)" },
+  family: { title: "Tân gia nhà Minh", subtitle: "Tiệc tân gia", personLabel: "Chủ nhà", personDetail: "Không bắt buộc" },
+  christmas: { title: "Giáng sinh 2026", subtitle: "Tiệc Giáng sinh", personLabel: "Chủ nhà", personDetail: "Không bắt buộc" },
+  corporate: { title: "Year End Party 2026", subtitle: "Tiệc tất niên", personLabel: "Đơn vị tổ chức", personDetail: "Không bắt buộc" },
+  greeting: { title: "Merry Christmas", subtitle: "Giáng sinh an lành", personLabel: "Người gửi", personDetail: "Gia đình … (không bắt buộc)" },
+  other: { title: "Tên sự kiện", subtitle: "Dòng phụ", personLabel: "Vai", personDetail: "Không bắt buộc" },
+};
+
+export function contentHints(eventType: string): ContentHints {
+  return HINTS[eventType as EventType] ?? HINTS.other;
 }

@@ -5,9 +5,13 @@ export const EVENT_TYPES = {
   family: "Tiệc gia đình",
   christmas: "Giáng sinh",
   corporate: "Sự kiện doanh nghiệp",
+  greeting: "Lời chúc (không có tiệc)",
   other: "Khác",
 } as const;
 export type EventType = keyof typeof EVENT_TYPES;
+
+/** "Lời chúc": thiệp chúc mừng không có tiệc — không buổi tiệc, bản đồ, RSVP, xếp bàn, check-in. */
+export const hasParty = (eventType: string) => eventType !== "greeting";
 
 export const EVENT_ROLES = {
   owner: "Chủ tiệc",

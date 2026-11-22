@@ -5,7 +5,8 @@ import { Suspense } from "react";
 import { ActionForm, SubmitButton } from "@/components/action-form";
 import { deleteGroup, undoImport } from "@/features/guests/actions";
 import { GuestList } from "@/features/guests/guest-list";
-import { countTrashedGuests, getEventForGuests, listGuests } from "@/features/guests/queries";
+import { countPendingRequests, countTrashedGuests, getEventForGuests, listGuests } from "@/features/guests/queries";
+import { hasParty } from "@/lib/labels";
 import { siteUrl } from "@/lib/site-url";
 import { getUserId } from "@/lib/supabase/server";
 import { Input } from "@/components/ui";
@@ -25,9 +26,15 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
   if (!ctx) notFound();
   if (ctx.myRole !== "owner" && ctx.myRole !== "cohost") redirect(`/app/events/${id}`);
 
-  const [{ guests, groups, invitations, recentImports }, base, trashed] = await Promise.all([listGuests(id), siteUrl(), countTrashedGuests(id)]);
+  const [{ guests, groups, invitations, recentImports }, base, trashed, requests] = await Promise.all([
+    listGuests(id),
+    siteUrl(),
+    countTrashedGuests(id),
+    countPendingRequests(id),
+  ]);
+  const party = hasParty(ctx.event.event_type);
   const people = guests.reduce((n, g) => n + g.max_party_size, 0);
-  const settings = (ctx.event.settings ?? {}) as { inviteMessage?: string; rsvpDeadline?: string };
+  const settings = (ctx.event.settings ?? {}) as { inviteMessage?: string; rsvpDeadline?: string; openRsvp?: boolean };
   const deadline = settings.rsvpDeadline ? settings.rsvpDeadline.slice(0, 10) : "";
 
   return (
@@ -38,7 +45,7 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
         </Link>
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-serif text-2xl">Khách mời</h1>
+            <h1 className="font-serif text-2xl">{party ? "Khách mời" : "Người nhận"}</h1>
             <p className="text-sm text-muted">
               {guests.length} khách · tối đa {people} người
             </p>
@@ -58,6 +65,28 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
           </div>
         </div>
       </div>
+
+      {party && (
+        <Link
+          href={`/app/events/${id}/guests/requests`}
+          className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2 text-sm ${
+            requests > 0 ? "border-accent/40 bg-accent/10" : "border-border bg-surface"
+          }`}
+        >
+          <span>
+            {requests > 0 ? (
+              <>
+                <b>Chờ duyệt ({requests})</b> · người đăng ký qua link chung
+              </>
+            ) : settings.openRsvp ? (
+              "Đăng ký qua link chung đang bật · chưa có ai chờ duyệt"
+            ) : (
+              "Gửi một link chung vào nhóm? Bật đăng ký qua link chung"
+            )}
+          </span>
+          <span className="font-semibold text-brand">{requests > 0 ? "Duyệt →" : "Mở →"}</span>
+        </Link>
+      )}
 
       {recentImports.map((job) => (
         <ActionForm
@@ -93,6 +122,7 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
         />
       )}
 
+      {party && (
       <ActionForm action={setRsvpDeadline.bind(null, id)} className="flex flex-wrap items-end gap-2 text-sm">
         <label>
           <span className="mb-1 block font-medium">Hạn trả lời</span>
@@ -103,6 +133,7 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
         </SubmitButton>
         <span className="pb-2.5 text-xs text-muted">{deadline ? "Sau ngày này khách không tự sửa câu trả lời được." : "Chưa đặt hạn."}</span>
       </ActionForm>
+      )}
 
       {trashed > 0 && (
         <Link href={`/app/events/${id}/guests/trash`} className="block text-sm text-muted underline">

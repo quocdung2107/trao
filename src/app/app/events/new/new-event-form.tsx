@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { Button, FormError, Input, Label, Select } from "@/components/ui";
-import { EVENT_TYPES, type EventType } from "@/lib/labels";
+import { EVENT_TYPES, hasParty, type EventType } from "@/lib/labels";
 import { createEvent } from "../actions";
 
 const DEFAULT_SESSION: Record<EventType, string> = {
@@ -12,6 +12,7 @@ const DEFAULT_SESSION: Record<EventType, string> = {
   family: "Tiệc",
   christmas: "Tiệc Giáng sinh",
   corporate: "Sự kiện chính",
+  greeting: "",
   other: "Buổi chính",
 };
 
@@ -33,8 +34,9 @@ export function NewEventForm() {
       </div>
       <div>
         <Label htmlFor="title">Tên sự kiện</Label>
-        <Input id="title" name="title" required maxLength={200} placeholder="Đám cưới An & Bình" />
+        <Input id="title" name="title" required maxLength={200} placeholder={type === "greeting" ? "Chúc mừng Giáng sinh 2026" : "Đám cưới An & Bình"} />
       </div>
+      {hasParty(type) ? (
       <div>
         <Label htmlFor="firstSession">Buổi tiệc đầu tiên</Label>
         <Input
@@ -48,6 +50,12 @@ export function NewEventForm() {
           Có nhiều buổi (vd tiệc nhà gái, tiệc nhà trai)? Bạn thêm các buổi còn lại ở bước sau.
         </p>
       </div>
+      ) : (
+        <p className="rounded-lg bg-background px-3 py-2 text-sm text-muted">
+          Thiệp chúc gửi lời chúc, ảnh và nhạc, không có buổi tiệc nên không có bản đồ, xác nhận tham dự hay xếp bàn. Hợp
+          cho chúc Giáng sinh, chúc Tết, chúc mừng sinh nhật từ xa.
+        </p>
+      )}
       <FormError message={state.error} />
       <Button type="submit" disabled={pending} className="w-full sm:w-auto">
         {pending ? "Đang tạo…" : "Tạo sự kiện"}

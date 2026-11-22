@@ -251,6 +251,38 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"rsvp_requests": {
+                  Row: {
+                    "created_at": string,"decided_at": string | null,"decided_by": string | null,"event_id": string,"guest_id": string | null,"id": string,"invitation_id": string,"name": string,"note": string | null,"party_size": number,"phone_e164": string | null,"policy_version": string,"session_ids": string[],"status": string,"token": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"event_id": string,"guest_id"?: string | null,"id"?: string,"invitation_id": string,"name": string,"note"?: string | null,"party_size": number,"phone_e164"?: string | null,"policy_version": string,"session_ids": string[],"status"?: string,"token"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"event_id"?: string,"guest_id"?: string | null,"id"?: string,"invitation_id"?: string,"name"?: string,"note"?: string | null,"party_size"?: number,"phone_e164"?: string | null,"policy_version"?: string,"session_ids"?: string[],"status"?: string,"token"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "rsvp_requests_event_id_fkey"
+      columns: ["event_id"]
+isOneToOne: false
+      referencedRelation: "events"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "rsvp_requests_guest_id_event_id_fkey"
+      columns: ["guest_id","event_id"]
+isOneToOne: false
+      referencedRelation: "guests"
+      referencedColumns: ["id","event_id"]
+    },{
+      foreignKeyName: "rsvp_requests_invitation_id_fkey"
+      columns: ["invitation_id"]
+isOneToOne: false
+      referencedRelation: "invitations"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"seat_assignments": {
                   Row: {
                     "assigned_at": string,"assigned_by": string | null,"event_id": string,"id": string,"seats": number,"session_id": string,"session_invite_id": string,"table_id": string
@@ -424,6 +456,9 @@ isOneToOne: false
             "accept_event_invite":
 { Args: { "p_token": string }; Returns: string
                            },
+"approve_rsvp_request":
+{ Args: { "p_merge_guest_id"?: string,"p_request_id": string }; Returns: string
+                           },
 "assign_seats":
 { Args: { "p_allow_over"?: boolean,"p_invite_ids": (string)[],"p_table_id": string }; Returns: Json
                            },
@@ -451,6 +486,9 @@ isOneToOne: false
 "get_guest_invitation":
 { Args: { "p_slug": string,"p_token": string }; Returns: Json
                            },
+"get_open_rsvp":
+{ Args: { "p_slug": string,"p_token": string }; Returns: Json
+                           },
 "get_guest_pass":
 { Args: { "p_token": string }; Returns: Json
                            },
@@ -469,8 +507,14 @@ isOneToOne: false
 "post_wish":
 { Args: { "p_message": string,"p_name": string,"p_slug": string,"p_token"?: string }; Returns: undefined
                            },
+"reject_rsvp_request":
+{ Args: { "p_request_id": string }; Returns: undefined
+                           },
 "restore_event":
 { Args: { "p_event_id": string }; Returns: undefined
+                           },
+"submit_open_rsvp":
+{ Args: { "p_consent_version"?: string,"p_name": string,"p_note"?: string,"p_party_size": number,"p_phone"?: string,"p_session_ids": (string)[],"p_slug": string }; Returns: Json
                            },
 "submit_rsvp":
 { Args: { "p_consent_version"?: string,"p_note"?: string,"p_responses": Json,"p_slug": string,"p_token": string }; Returns: Json
