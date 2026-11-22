@@ -1,5 +1,7 @@
 import type { InvitationView } from "../view";
 import { BaseTemplate, type TemplateSlots, type Theme } from "./base";
+import { FestiveTemplate } from "./festive/festive-template";
+import { FESTIVE_PRESETS, isFestiveKey, type FestiveKey } from "./festive/presets";
 
 function Leaf({ color }: { color: string }) {
   return (
@@ -61,22 +63,37 @@ const THEMES = {
   },
 } satisfies Record<string, Theme>;
 
-export type TemplateKey = keyof typeof THEMES;
+export type TemplateKey = keyof typeof THEMES | FestiveKey;
 
 export const TEMPLATES: { key: TemplateKey; name: string; description: string }[] = [
   { key: "la", name: "Lá", description: "Xanh lá và kem, chữ có chân. Hợp đám cưới, tiệc gia đình." },
   { key: "toi-gian", name: "Tối giản", description: "Trắng đen, ảnh bìa tràn màn hình. Hợp mọi loại sự kiện." },
   { key: "vui-tuoi", name: "Vui tươi", description: "Màu cam và vàng, chữ không chân. Hợp sinh nhật, đầy tháng, thôi nôi." },
   { key: "am-ap", name: "Ấm áp", description: "Đỏ gạch và vàng đồng, chữ có chân. Hợp đám hỏi, tân gia, mừng thọ." },
+  // Mẫu lễ hội: bìa "Chạm để mở thiệp", nhạc, tự lướt, album động.
+  ...(Object.entries(FESTIVE_PRESETS) as [FestiveKey, (typeof FESTIVE_PRESETS)[FestiveKey]][]).map(([key, p]) => ({
+    key,
+    name: p.name,
+    description: p.description,
+  })),
 ];
 
-export const DEFAULT_TEMPLATE: TemplateKey = "la";
+export const DEFAULT_TEMPLATE: keyof typeof THEMES = "la";
 
 export function isTemplateKey(k: string): k is TemplateKey {
-  return k in THEMES;
+  return k in THEMES || isFestiveKey(k);
 }
 
-export function InvitationTemplate({ templateKey, view, ...slots }: { templateKey: string; view: InvitationView } & TemplateSlots) {
-  const theme = THEMES[isTemplateKey(templateKey) ? templateKey : DEFAULT_TEMPLATE];
+/** Mẫu có màn bìa, nhạc và tự lướt (dùng để hiện các tùy chọn tương ứng trong trình sửa). */
+export const isFestiveTemplate = isFestiveKey;
+
+export function InvitationTemplate({
+  templateKey,
+  view,
+  frame = "page",
+  ...slots
+}: { templateKey: string; view: InvitationView; frame?: "page" | "preview" } & TemplateSlots) {
+  if (isFestiveKey(templateKey)) return <FestiveTemplate presetKey={templateKey} view={view} frame={frame} {...slots} />;
+  const theme = THEMES[templateKey in THEMES ? (templateKey as keyof typeof THEMES) : DEFAULT_TEMPLATE];
   return <BaseTemplate view={view} theme={theme} {...slots} />;
 }

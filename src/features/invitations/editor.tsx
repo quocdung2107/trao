@@ -8,7 +8,8 @@ import { createClient } from "@/lib/supabase/client";
 import { saveInvitation, setInvitationPublished } from "./actions";
 import { compressImage } from "./compress";
 import { MAX_GALLERY, type InvitationContent, type Person } from "./content";
-import { InvitationTemplate, TEMPLATES } from "./templates/registry";
+import { MUSIC_NONE, MUSIC_PRESET, MUSIC_TRACKS } from "./templates/festive/music";
+import { InvitationTemplate, isFestiveTemplate, TEMPLATES } from "./templates/registry";
 import { mediaUrl, type InvitationSession } from "./view";
 
 type Props = {
@@ -108,7 +109,10 @@ export function InvitationEditor(props: Props) {
     <div className="mx-auto w-full max-w-[400px] overflow-hidden rounded-[2rem] border-8 border-foreground/90 bg-white shadow-xl">
       <div className="h-[720px] overflow-y-auto">
         <InvitationTemplate
+          // Đổi key khi đổi mẫu để màn bìa "Mở thiệp" hiện lại từ đầu.
+          key={templateKey}
           templateKey={templateKey}
+          frame="preview"
           view={{ content, event: props.event, sessions: visibleSessions }}
         />
       </div>
@@ -190,6 +194,42 @@ export function InvitationEditor(props: Props) {
               ))}
             </div>
           </fieldset>
+
+          {/* Tùy chọn riêng của mẫu lễ hội */}
+          {isFestiveTemplate(templateKey) && (
+            <fieldset className="space-y-3">
+              <legend className="mb-2 font-serif text-lg">Nhạc và hiệu ứng</legend>
+              <div>
+                <Label htmlFor="music">Nhạc nền</Label>
+                <select
+                  id="music"
+                  className={textarea}
+                  value={content.music}
+                  onChange={(e) => set("music", e.target.value)}
+                >
+                  <option value={MUSIC_PRESET}>Theo mẫu</option>
+                  {Object.entries(MUSIC_TRACKS).map(([k, t]) => (
+                    <option key={k} value={k}>
+                      {t.name}
+                    </option>
+                  ))}
+                  <option value={MUSIC_NONE}>Không có nhạc</option>
+                </select>
+                <p className="mt-1 text-xs text-muted">Nhạc chỉ phát sau khi khách bấm &quot;Mở thiệp&quot;. Khách tắt được bất cứ lúc nào.</p>
+              </div>
+              <label className="flex items-start gap-2 text-sm">
+                <input type="checkbox" className="mt-1" checked={content.autoScroll} onChange={(e) => set("autoScroll", e.target.checked)} />
+                <span>
+                  Tự lướt sau khi mở thiệp
+                  <span className="block text-xs text-muted">Dừng ngay khi khách chạm màn hình, và dừng hẳn trước phần thông tin buổi tiệc.</span>
+                </span>
+              </label>
+              <div>
+                <Label htmlFor="marquee">Chữ chạy</Label>
+                <Input id="marquee" value={content.marquee} maxLength={160} onChange={(e) => set("marquee", e.target.value)} placeholder="Để trống để dùng câu mặc định của mẫu" />
+              </div>
+            </fieldset>
+          )}
 
           {/* Nội dung chính */}
           <fieldset className="space-y-3">

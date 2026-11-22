@@ -56,9 +56,9 @@ async function Invitation({ props }: { props: PageProps<"/[slug]"> }) {
       }
       footer={
         <footer className="px-6 pt-4 pb-10 text-center text-xs opacity-60">
-          Thiệp tạo bằng{" "}
-          <Link href="/" className="font-semibold underline">
-            TRAO
+          {/* Dấu nhỏ để người nhận tự tạo thiệp; ?ref=thiep để đo số chủ tiệc mới đến từ thiệp. Không banner, không popup. */}
+          <Link href="/?ref=thiep" className="underline-offset-2 hover:underline">
+            Tạo bằng <strong>TRAO</strong>
           </Link>
           {guest && token && (
             <>

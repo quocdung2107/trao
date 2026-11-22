@@ -24,6 +24,13 @@ export const invitationContentSchema = z.object({
   gallery: z.array(mediaPath).max(MAX_GALLERY).default([]),
   showCountdown: z.boolean().default(true),
   showWishes: z.boolean().default(true),
+  // Chỉ mẫu lễ hội (festive) dùng các trường dưới; mẫu khác bỏ qua.
+  /** Tự lướt sau khi khách bấm "Mở thiệp". */
+  autoScroll: z.boolean().default(true),
+  /** "preset" = nhạc mặc định của mẫu, "none" = tắt nhạc, hoặc khóa trong festive/music.ts. */
+  music: z.string().regex(/^[a-z0-9-]{1,40}$/).default("preset"),
+  /** Chữ chạy; để trống thì dùng câu mặc định của mẫu. */
+  marquee: z.string().trim().max(160).default(""),
 });
 
 export type InvitationContent = z.infer<typeof invitationContentSchema>;
