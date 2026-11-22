@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import { ActionForm, SubmitButton } from "@/components/action-form";
 import { deleteGroup, undoImport } from "@/features/guests/actions";
 import { GuestList } from "@/features/guests/guest-list";
-import { getEventForGuests, listGuests } from "@/features/guests/queries";
+import { countTrashedGuests, getEventForGuests, listGuests } from "@/features/guests/queries";
 import { siteUrl } from "@/lib/site-url";
 import { getUserId } from "@/lib/supabase/server";
 import { Input } from "@/components/ui";
@@ -25,7 +25,7 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
   if (!ctx) notFound();
   if (ctx.myRole !== "owner" && ctx.myRole !== "cohost") redirect(`/app/events/${id}`);
 
-  const [{ guests, groups, invitations, recentImports }, base] = await Promise.all([listGuests(id), siteUrl()]);
+  const [{ guests, groups, invitations, recentImports }, base, trashed] = await Promise.all([listGuests(id), siteUrl(), countTrashedGuests(id)]);
   const people = guests.reduce((n, g) => n + g.max_party_size, 0);
   const settings = (ctx.event.settings ?? {}) as { inviteMessage?: string; rsvpDeadline?: string };
   const deadline = settings.rsvpDeadline ? settings.rsvpDeadline.slice(0, 10) : "";
@@ -43,7 +43,12 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
               {guests.length} khách · tối đa {people} người
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            {guests.length > 0 && (
+              <a href={`/app/events/${id}/export`} className={ghostBtn}>
+                Xuất Excel
+              </a>
+            )}
             <Link href={`/app/events/${id}/guests/import`} className={ghostBtn}>
               Nhập từ Excel
             </Link>
@@ -98,6 +103,12 @@ async function Guests({ params }: { params: PageProps<"/app/events/[id]/guests">
         </SubmitButton>
         <span className="pb-2.5 text-xs text-muted">{deadline ? "Sau ngày này khách không tự sửa câu trả lời được." : "Chưa đặt hạn."}</span>
       </ActionForm>
+
+      {trashed > 0 && (
+        <Link href={`/app/events/${id}/guests/trash`} className="block text-sm text-muted underline">
+          Thùng rác ({trashed} khách đã xóa)
+        </Link>
+      )}
 
       {groups.length > 0 && (
         <details className="text-sm">

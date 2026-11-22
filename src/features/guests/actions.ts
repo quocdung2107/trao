@@ -237,3 +237,18 @@ export async function undoImport(jobId: string, _prev: ActionState): Promise<Act
   refresh();
   return { ok: true };
 }
+
+// ---------------------------------------------------------------- thùng rác
+
+export async function restoreGuest(guestId: string, _prev: ActionState): Promise<ActionState> {
+  await requireUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("guests")
+    .update({ deleted_at: null })
+    .eq("id", uuid.parse(guestId))
+    .select("id");
+  if (error || !data?.length) return { error: dbErrorMessage(error, "Bạn không có quyền khôi phục khách này.") };
+  refresh();
+  return { ok: true };
+}

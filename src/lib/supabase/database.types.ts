@@ -445,6 +445,9 @@ isOneToOne: false
 "event_stats":
 { Args: { "p_event_id": string }; Returns: Json
                            },
+"export_event":
+{ Args: { "p_event_id": string }; Returns: Json
+                           },
 "get_guest_invitation":
 { Args: { "p_slug": string,"p_token": string }; Returns: Json
                            },

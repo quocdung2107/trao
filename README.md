@@ -49,7 +49,7 @@ chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng m�
 | M1 | Mẫu thiệp, trình sửa, xuất bản, ảnh xem trước Zalo | xong |
 | M2 | Khách mời, nhập Excel, link cá nhân, RSVP, lời chúc | xong |
 | M3 | Xếp bàn, lịch sử đổi bàn, check-in tại sảnh, thẻ vào tiệc có QR | xong |
-| M4 | Hoàn thiện, xuất Excel, thử với sự kiện thật | |
+| M4 | Xuất Excel, thùng rác 30 ngày, tên hiển thị (M4a); mẫu thiệp thêm, trang quyền riêng tư (M4b) | đang làm |
 
 ## Triển khai
 
