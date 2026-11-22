@@ -82,7 +82,8 @@ export type EventStats = {
   max_people: number;
   sent: number;
   wishes: number;
-  sessions: { id: string; name: string; invited: number; yes: number; no: number; maybe: number; pending: number; attending: number }[];
+  sessions: { id: string; name: string; invited: number; yes: number; no: number; maybe: number; pending: number; attending: number;
+    seated: number; to_seat: number; tables: number }[];
 };
 
 export async function getEventStats(eventId: string) {

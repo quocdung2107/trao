@@ -171,6 +171,11 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
                           <b className="text-brand">{s.attending} người sẽ đến</b> ({s.yes} khách) · {s.maybe} chưa chắc · {s.no}{" "}
                           không đến · {s.pending} chưa trả lời
                         </p>
+                        {s.tables > 0 && (
+                          <p className="text-xs text-muted">
+                            Đã xếp bàn {s.seated}/{s.to_seat} khách · {s.tables} bàn
+                          </p>
+                        )}
                       </li>
                     );
                   })}
@@ -202,9 +207,14 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
                   </p>
                 </div>
                 {canEdit && (
-                  <ActionForm action={deleteSession.bind(null, s.id)} confirm={`Xóa buổi "${s.name}"?`}>
-                    <SubmitButton className={dangerLink}>Xóa</SubmitButton>
-                  </ActionForm>
+                  <div className="flex shrink-0 items-center gap-3">
+                    <Link href={`/app/events/${event.id}/seating?s=${s.id}`} className={linkBtn}>
+                      Xếp bàn
+                    </Link>
+                    <ActionForm action={deleteSession.bind(null, s.id)} confirm={`Xóa buổi "${s.name}"?`}>
+                      <SubmitButton className={dangerLink}>Xóa</SubmitButton>
+                    </ActionForm>
+                  </div>
                 )}
               </li>
             ))}
