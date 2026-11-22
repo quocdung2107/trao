@@ -1,0 +1,536 @@
+/* Engine thiệp lễ hội. CSS toàn cục, mọi lớp đều có tiền tố fx- (dự án nạp *.css qua Tailwind nên không dùng CSS Modules). Chỉ animate transform và opacity để mượt trên máy yếu. */
+
+/* ---------- Màn bìa ---------- */
+.fx-cover {
+  /* Vị trí (absolute, chiều cao) đặt bằng lớp Tailwind trong stage.tsx. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: center;
+  background: var(--fx-cover-bg);
+  color: var(--fx-cover-fg);
+  padding: 3.5rem 1.5rem 2.75rem;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform 0.9s cubic-bezier(0.7, 0, 0.3, 1),
+    opacity 0.9s ease;
+}
+.fx-coverLeaving {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.fx-coverArt {
+  transition: transform 0.7s cubic-bezier(0.6, 0, 0.3, 1);
+}
+.fx-coverLeaving .fx-coverArt {
+  transform: scale(1.25);
+}
+
+/* Nút mở thiệp: to, có chữ, "thở" và có vòng sáng lan ra. */
+.fx-openWrap {
+  position: relative;
+  width: min(78%, 320px);
+  margin-top: 2rem;
+}
+.fx-openBtn {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 0;
+  background: var(--fx-button);
+  color: var(--fx-button-fg);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  animation: fx-breathe 1.6s ease-in-out infinite;
+}
+.fx-openBtn:focus-visible {
+  outline: 3px solid var(--fx-cover-fg);
+  outline-offset: 4px;
+}
+/* Vệt sáng quét ngang. */
+.fx-openBtn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: fx-shine 3.2s ease-in-out 0.8s infinite;
+}
+.fx-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--fx-button);
+  opacity: 0;
+  animation: fx-ripple 1.6s ease-out infinite;
+}
+.fx-ripple + .fx-ripple {
+  animation-delay: 0.8s;
+}
+.fx-note {
+  display: inline-block;
+  animation: fx-noteBob 1.6s ease-in-out infinite;
+}
+/* Gợi ý ngón tay, chỉ hiện sau vài giây chưa bấm. */
+.fx-hint {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -1.75rem;
+  z-index: 2;
+  font-size: 2rem;
+  opacity: 0;
+  pointer-events: none;
+}
+.fx-hintOn {
+  animation: fx-tap 1.1s ease-in-out infinite;
+}
+.fx-subtle {
+  margin-top: 0.9rem;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+@keyframes fx-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+@keyframes fx-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  100% {
+    transform: scale(1.35, 1.8);
+    opacity: 0;
+  }
+}
+@keyframes fx-shine {
+  0% {
+    transform: translateX(-120%);
+  }
+  45%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+@keyframes fx-noteBob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(8deg);
+  }
+}
+@keyframes fx-tap {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-6px, -8px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* Phong bì (Lò sưởi). */
+.fx-envelope {
+  position: relative;
+  width: 15rem;
+  height: 10rem;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  background: #f4e4cc;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+  animation: fx-wobble 4s ease-in-out 2.5s infinite;
+}
+.fx-envelope::before {
+  /* Nắp phong bì. */
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 5.5rem;
+  background: #ead3b1;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+.fx-envelope::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 100%;
+  background: linear-gradient(to top right, transparent 49.5%, #e9d6b9 50%) left / 50% 100% no-repeat,
+    linear-gradient(to top left, transparent 49.5%, #e9d6b9 50%) right / 50% 100% no-repeat;
+  border-radius: 0.5rem;
+  opacity: 0.6;
+}
+.fx-seal {
+  position: absolute;
+  left: 50%;
+  top: 4.25rem;
+  z-index: 1;
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, #d0533c, #8e2416 70%);
+  color: #fbe3c7;
+  font-size: 1.25rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%);
+}
+@keyframes fx-wobble {
+  0%,
+  86%,
+  100% {
+    transform: rotate(0);
+  }
+  89% {
+    transform: rotate(-3deg);
+  }
+  92% {
+    transform: rotate(3deg);
+  }
+  95% {
+    transform: rotate(-2deg);
+  }
+}
+
+/* Ngôi sao (Đêm Thánh). */
+.fx-starWrap {
+  position: relative;
+  width: 9rem;
+  height: 9rem;
+  margin: 0 auto;
+}
+.fx-starGlow {
+  position: absolute;
+  inset: -2rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 226, 150, 0.55) 0%, rgba(255, 226, 150, 0) 65%);
+  animation: fx-glow 3s ease-in-out infinite;
+}
+@keyframes fx-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* Khung Art Deco (Gala). */
+.fx-deco {
+  position: absolute;
+  inset: 1rem;
+  border: 1px solid color-mix(in srgb, var(--inv-accent) 60%, transparent);
+  pointer-events: none;
+}
+.fx-deco::before {
+  content: "";
+  position: absolute;
+  inset: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--inv-accent) 35%, transparent);
+}
+.fx-fan {
+  margin: 0 auto;
+  width: 11rem;
+  height: 6rem;
+}
+
+/* ---------- Thân thiệp ---------- */
+.fx-body {
+  animation: fx-rise 0.9s ease both;
+}
+@keyframes fx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Lớp hạt: dính trên cùng của khung cuộn, không chiếm chỗ. */
+.fx-particles {
+  position: sticky;
+  top: 0;
+  /* Trên cả màn bìa (z-40) để tuyết rơi ngay từ lúc chưa mở thiệp. */
+  z-index: 45;
+  display: block;
+  width: 100%;
+  height: 100svh;
+  margin-bottom: -100svh;
+  pointer-events: none;
+}
+.fx-previewFrame .fx-particles {
+  height: 720px;
+  margin-bottom: -720px;
+}
+
+/* Chữ chạy. */
+.fx-marquee {
+  overflow: hidden;
+  border-block: 1px solid var(--inv-line);
+  padding-block: 0.7rem;
+  white-space: nowrap;
+}
+.fx-marqueeTrack {
+  display: inline-flex;
+  animation: fx-marquee 22s linear infinite;
+}
+.fx-marqueeTrack span {
+  padding-inline: 1.25rem;
+}
+@keyframes fx-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Album: băng ngang, vuốt bằng scroll-snap; JS chỉ tự chuyển ảnh. */
+.fx-strip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 1.5rem 12%;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.fx-strip::-webkit-scrollbar {
+  display: none;
+}
+.fx-slide {
+  flex: 0 0 76%;
+  scroll-snap-align: center;
+}
+.fx-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.fx-kenburns {
+  animation: fx-kenburns 9s ease-in-out infinite alternate;
+}
+@keyframes fx-kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12) translate(-2%, -2%);
+  }
+}
+
+.fx-polaroid {
+  position: relative;
+  background: #fffdf8;
+  padding: 0.6rem 0.6rem 2.2rem;
+  box-shadow: 0 12px 24px -10px rgba(60, 30, 10, 0.45);
+  transform-origin: 50% -1.5rem;
+  animation: fx-swing 4.5s ease-in-out infinite;
+}
+.fx-polaroid::before {
+  /* Kẹp gỗ. */
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -0.9rem;
+  width: 0.7rem;
+  height: 1.6rem;
+  border-radius: 2px;
+  background: #b0834f;
+  transform: translateX(-50%);
+}
+.fx-slide:nth-child(even) .fx-polaroid {
+  animation-delay: -2.2s;
+}
+@keyframes fx-swing {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+.fx-string {
+  height: 2px;
+  margin: 0 -1.5rem -1.6rem;
+  background: #b0834f;
+  opacity: 0.6;
+  position: relative;
+  top: 0.4rem;
+}
+
+.fx-arch {
+  overflow: hidden;
+  border-radius: 999px 999px 0.75rem 0.75rem;
+  border: 3px solid var(--inv-accent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--inv-accent) 18%, transparent);
+}
+
+.fx-film {
+  background: #050505;
+  padding: 1.1rem 0.45rem;
+  position: relative;
+}
+.fx-film::before,
+.fx-film::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0.55rem;
+  background: repeating-linear-gradient(90deg, transparent 0 0.35rem, #e8e2d2 0.35rem 0.8rem, transparent 0.8rem 1.15rem);
+  opacity: 0.85;
+}
+.fx-film::before {
+  top: 0.28rem;
+}
+.fx-film::after {
+  bottom: 0.28rem;
+}
+
+.fx-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.fx-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: var(--inv-line);
+}
+.fx-dotOn {
+  background: var(--inv-accent);
+}
+
+/* Hiện dần khi cuộn tới. */
+.fx-reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s ease;
+}
+.fx-revealOn {
+  opacity: 1;
+  transform: none;
+}
+
+/* Nút nổi: nhạc và tự lướt. Dính đáy khung cuộn, không chiếm chỗ. */
+.fx-dock {
+  position: sticky;
+  bottom: 1rem;
+  z-index: 30;
+  display: flex;
+  height: 0;
+  /* Khung cao 0: nút mọc lên từ đáy, không đẩy nội dung. */
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-inline: 1rem;
+}
+.fx-dockInner {
+  display: flex;
+  gap: 0.5rem;
+}
+.fx-fab {
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--inv-fg) 15%, transparent);
+  background: color-mix(in srgb, var(--inv-card) 92%, transparent);
+  color: var(--inv-accent);
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4);
+  font-size: 1.1rem;
+}
+.fx-fabSpin {
+  animation: fx-spin 4s linear infinite;
+}
+@keyframes fx-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Người dùng chọn giảm chuyển động: tắt hết, giữ nút to và rõ. */
+@media (prefers-reduced-motion: reduce) {
+  .fx-openBtn,
+  .fx-openBtn::after,
+  .fx-ripple,
+  .fx-note,
+  .fx-hintOn,
+  .fx-envelope,
+  .fx-starGlow,
+  .fx-marqueeTrack,
+  .fx-kenburns,
+  .fx-polaroid,
+  .fx-fabSpin,
+  .fx-body {
+    animation: none !important;
+  }
+  .fx-ripple,
+  .fx-openBtn::after {
+    display: none;
+  }
+  .fx-cover,
+  .fx-coverArt,
+  .fx-reveal {
+    transition: opacity 0.3s ease !important;
+  }
+  .fx-coverLeaving,
+  .fx-coverLeaving .fx-coverArt,
+  .fx-reveal {
+    transform: none !important;
+  }
+  .fx-marquee {
+    white-space: normal;
+    text-align: center;
+  }
+  .fx-marqueeTrack {
+    display: block;
+  }
+  .fx-marqueeTrack span[aria-hidden] {
+    display: none;
+  }
+}
