@@ -53,5 +53,9 @@ chạy migration + test trên Postgres thuần (cần extension pgTAP), dùng m�
 
 ## Triển khai
 
+- Hosting: Vercel, import repo này (framework Next.js, tự nhận pnpm). `vercel.json` đặt máy chủ ở Singapore (`sin1`),
+  cùng vùng với Supabase (ap-southeast-1), để mỗi lần đọc dữ liệu không phải đi vòng qua Mỹ.
+- Biến môi trường trên Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL`.
+  Không cần khóa secret/service_role. Đổi biến `NEXT_PUBLIC_*` thì phải deploy lại mới có hiệu lực.
 - Đặt `NEXT_PUBLIC_SITE_URL` (vd `https://trao.vn`): dùng cho link thiệp, link đăng nhập và ảnh xem trước.
 - Trong Supabase → Authentication → URL Configuration: Site URL = domain trên, thêm Redirect URL `<domain>/auth/callback`.
