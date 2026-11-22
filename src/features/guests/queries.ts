@@ -102,3 +102,26 @@ export async function listWishes(eventId: string) {
     .limit(500);
   return data ?? [];
 }
+
+/** Khách đã xóa trong 30 ngày (sau đó bị xóa hẳn hằng đêm). */
+export async function listTrashedGuests(eventId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("guests")
+    .select("id, display_name, max_party_size, deleted_at")
+    .eq("event_id", eventId)
+    .not("deleted_at", "is", null)
+    .order("deleted_at", { ascending: false })
+    .limit(2000);
+  return data ?? [];
+}
+
+export async function countTrashedGuests(eventId: string) {
+  const supabase = await createClient();
+  const { count } = await supabase
+    .from("guests")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", eventId)
+    .not("deleted_at", "is", null);
+  return count ?? 0;
+}

@@ -195,11 +195,18 @@ async function EventDetail({ params }: { params: PageProps<"/app/events/[id]">["
               </ul>
             </>
           )}
-          {stats.wishes > 0 && (
-            <Link href={`/app/events/${event.id}/wishes`} className={`mt-4 inline-block ${linkBtn}`}>
-              Xem {stats.wishes} lời chúc →
-            </Link>
-          )}
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2">
+            {stats.wishes > 0 && (
+              <Link href={`/app/events/${event.id}/wishes`} className={linkBtn}>
+                Xem {stats.wishes} lời chúc →
+              </Link>
+            )}
+            {canEdit && (
+              <Link href={`/app/events/${event.id}/history`} className={linkBtn}>
+                Lịch sử thay đổi
+              </Link>
+            )}
+          </div>
         </Card>
       )}
 
