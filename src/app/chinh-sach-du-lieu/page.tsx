@@ -23,6 +23,10 @@ export default function DataPolicyPage() {
           Khi bạn xác nhận tham dự, câu trả lời, số người đi và lời nhắn được gửi tới chủ tiệc và những người họ cho phép quản lý sự
           kiện.
         </li>
+        <li>
+          Nếu bạn tự đăng ký tham dự qua link chung, tên, số người, buổi bạn chọn, lời nhắn và số điện thoại (nếu bạn nhập) được gửi
+          tới chủ tiệc để duyệt. Nếu chủ tiệc từ chối, số điện thoại và lời nhắn bị xóa ngay; phần còn lại bị xóa sau 30 ngày.
+        </li>
         <li>Lời chúc bạn gửi sẽ hiện công khai trên thiệp cho mọi người có link, trừ khi chủ tiệc ẩn đi.</li>
         <li>Số điện thoại của bạn không bao giờ hiện trên thiệp và không được dùng cho quảng cáo hay sự kiện khác.</li>
         <li>TRAO không đặt công cụ theo dõi hay quảng cáo của bên thứ ba trên trang thiệp.</li>

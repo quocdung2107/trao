@@ -44,7 +44,7 @@ export async function createEvent(_prev: ActionState, formData: FormData): Promi
     p_workspace_id: workspaceId,
     p_title: parsed.data.title,
     p_event_type: parsed.data.eventType,
-    p_first_session_name: parsed.data.firstSession || undefined,
+    p_first_session_name: parsed.data.eventType === "greeting" ? undefined : parsed.data.firstSession || undefined,
   });
   if (error || !data) return { error: dbErrorMessage(error) };
   redirect(`/app/events/${data}`);

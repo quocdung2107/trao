@@ -13,7 +13,8 @@ async function Form({ searchParams }: { searchParams: PageProps<"/login">["searc
     <>
       {error === "link" && (
         <p role="alert" className="mb-4 text-sm text-danger">
-          Liên kết đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng gửi lại.
+          Liên kết đăng nhập không dùng được: có thể nó đã được bấm một lần, hoặc được mở ở trình duyệt khác với trình duyệt
+          bạn nhập email. Hãy nhập lại email, rồi mở liên kết mới ngay trên trình duyệt này (hoặc nhập mã 6 số trong email).
         </p>
       )}
       <LoginForm next={safeNext(typeof next === "string" ? next : null)} />

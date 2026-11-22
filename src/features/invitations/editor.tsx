@@ -7,10 +7,10 @@ import { CopyButton } from "@/components/copy-button";
 import { createClient } from "@/lib/supabase/client";
 import { saveInvitation, setInvitationPublished } from "./actions";
 import { compressImage } from "./compress";
-import { MAX_GALLERY, type InvitationContent, type Person } from "./content";
+import { MAX_GALLERY, contentHints, type InvitationContent, type Person } from "./content";
 import { MUSIC_NONE, MUSIC_PRESET, MUSIC_TRACKS } from "./templates/festive/music";
 import { InvitationTemplate, isFestiveTemplate, TEMPLATES } from "./templates/registry";
-import { mediaUrl, type InvitationSession } from "./view";
+import { mediaUrl, withoutPartyIfGreeting, type InvitationSession } from "./view";
 
 type Props = {
   invitationId: string;
@@ -38,6 +38,8 @@ export function InvitationEditor(props: Props) {
   const [saving, startSave] = useTransition();
   const [publishing, startPublish] = useTransition();
   const published = Boolean(props.publishedAt);
+  const hints = contentHints(props.event.event_type);
+  const party = props.event.event_type !== "greeting";
 
   const touch = () => {
     setDirty(true);
@@ -113,7 +115,7 @@ export function InvitationEditor(props: Props) {
           key={templateKey}
           templateKey={templateKey}
           frame="preview"
-          view={{ content, event: props.event, sessions: visibleSessions }}
+          view={withoutPartyIfGreeting({ content, event: props.event, sessions: visibleSessions })}
         />
       </div>
     </div>
@@ -236,12 +238,12 @@ export function InvitationEditor(props: Props) {
             <legend className="mb-2 font-serif text-lg">Nội dung</legend>
             <div>
               <Label htmlFor="title">Tiêu đề lớn</Label>
-              <Input id="title" value={content.title} maxLength={80} onChange={(e) => set("title", e.target.value)} placeholder="An & Bình" />
+              <Input id="title" value={content.title} maxLength={80} onChange={(e) => set("title", e.target.value)} placeholder={hints.title} />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <Label htmlFor="subtitle">Dòng phụ</Label>
-                <Input id="subtitle" value={content.subtitle} maxLength={80} onChange={(e) => set("subtitle", e.target.value)} placeholder="Lễ thành hôn" />
+                <Input id="subtitle" value={content.subtitle} maxLength={80} onChange={(e) => set("subtitle", e.target.value)} placeholder={hints.subtitle} />
               </div>
               <div>
                 <Label htmlFor="heading">Lời mở</Label>
@@ -253,7 +255,7 @@ export function InvitationEditor(props: Props) {
               <p className="text-sm font-medium">Nhân vật chính</p>
               {content.people.map((p, i) => (
                 <div key={i} className="grid gap-2 rounded-lg border border-border bg-surface p-3 sm:grid-cols-[120px_1fr]">
-                  <Input aria-label="Vai" value={p.label} maxLength={40} onChange={(e) => setPerson(i, { label: e.target.value })} placeholder="Chú rể" />
+                  <Input aria-label="Vai" value={p.label} maxLength={40} onChange={(e) => setPerson(i, { label: e.target.value })} placeholder={hints.personLabel} />
                   <Input aria-label="Tên" value={p.name} maxLength={80} onChange={(e) => setPerson(i, { name: e.target.value })} placeholder="Họ tên" />
                   <Input
                     aria-label="Ghi chú"
@@ -261,7 +263,7 @@ export function InvitationEditor(props: Props) {
                     value={p.detail}
                     maxLength={160}
                     onChange={(e) => setPerson(i, { detail: e.target.value })}
-                    placeholder="Con ông … và bà … (không bắt buộc)"
+                    placeholder={hints.personDetail}
                   />
                   <button
                     type="button"
@@ -284,17 +286,19 @@ export function InvitationEditor(props: Props) {
             </div>
 
             <div>
-              <Label htmlFor="message">Lời mời</Label>
+              <Label htmlFor="message">{party ? "Lời mời" : "Lời chúc"}</Label>
               <textarea id="message" className={textarea} rows={4} maxLength={1000} value={content.message} onChange={(e) => set("message", e.target.value)} />
             </div>
             <div>
               <Label htmlFor="closing">Lời kết</Label>
               <textarea id="closing" className={textarea} rows={2} maxLength={300} value={content.closing} onChange={(e) => set("closing", e.target.value)} />
             </div>
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={content.showCountdown} onChange={(e) => set("showCountdown", e.target.checked)} />
-              Hiện đồng hồ đếm ngược tới buổi đầu tiên
-            </label>
+            {party && (
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={content.showCountdown} onChange={(e) => set("showCountdown", e.target.checked)} />
+                Hiện đồng hồ đếm ngược tới buổi đầu tiên
+              </label>
+            )}
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={content.showWishes} onChange={(e) => set("showWishes", e.target.checked)} />
               Cho khách gửi lời chúc trên thiệp
@@ -352,8 +356,8 @@ export function InvitationEditor(props: Props) {
 
           {/* Buổi hiển thị + tên nội bộ */}
           <fieldset className="space-y-3">
-            <legend className="mb-2 font-serif text-lg">Thiệp này mời dự</legend>
-            {props.sessions.length === 0 ? (
+            <legend className="mb-2 font-serif text-lg">{party ? "Thiệp này mời dự" : "Thông tin khác"}</legend>
+            {!party ? null : props.sessions.length === 0 ? (
               <p className="text-sm text-muted">Sự kiện chưa có buổi tiệc nào. Thêm buổi ở trang sự kiện.</p>
             ) : (
               <div className="space-y-2">

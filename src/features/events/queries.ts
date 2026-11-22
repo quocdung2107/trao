@@ -30,7 +30,7 @@ export async function getEventDetail(eventId: string, userId: string) {
   const supabase = await createClient();
   const { data: event } = await supabase
     .from("events")
-    .select("id, title, event_type, status, deleted_at, created_at")
+    .select("id, title, event_type, status, settings, deleted_at, created_at")
     .eq("id", eventId)
     .maybeSingle();
   if (!event) return null;

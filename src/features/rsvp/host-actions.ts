@@ -86,3 +86,44 @@ export async function showWish(wishId: string, _prev: ActionState) {
 export async function deleteWish(wishId: string, _prev: ActionState) {
   return changeWish(wishId, "delete");
 }
+
+// ---------------------------------------------------------------- RSVP mở: bật/tắt, duyệt, từ chối
+
+/** Bật/tắt đăng ký tham dự qua link chung. Làm mới cache mọi thiệp của sự kiện để form hiện/ẩn ngay. */
+export async function setOpenRsvp(eventId: string, open: boolean, _prev: ActionState): Promise<ActionState> {
+  await requireUser();
+  const supabase = await createClient();
+  const id = uuid.parse(eventId);
+  const { data: ev } = await supabase.from("events").select("settings, event_type").eq("id", id).maybeSingle();
+  if (!ev) return { error: "Không tìm thấy sự kiện." };
+  if (ev.event_type === "greeting") return { error: "Thiệp Lời chúc không có đăng ký tham dự." };
+  const settings: Record<string, Json | undefined> = { ...((ev.settings as Record<string, Json>) ?? {}), openRsvp: open };
+  const { data, error } = await supabase.from("events").update({ settings }).eq("id", id).select("id");
+  if (error || !data?.length) return { error: dbErrorMessage(error, "Bạn không có quyền đổi cài đặt này.") };
+  const { data: invs } = await supabase.from("invitations").select("slug").eq("event_id", id);
+  for (const inv of invs ?? []) updateTag(invitationTag(inv.slug));
+  refresh();
+  return { ok: true };
+}
+
+/** Duyệt thành khách mới, hoặc gộp vào khách sẵn có khi là cùng một người. */
+export async function approveRsvpRequest(requestId: string, mergeGuestId: string | null, _prev: ActionState): Promise<ActionState> {
+  await requireUser();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("approve_rsvp_request", {
+    p_request_id: uuid.parse(requestId),
+    p_merge_guest_id: mergeGuestId ? uuid.parse(mergeGuestId) : undefined,
+  });
+  if (error) return { error: dbErrorMessage(error, "Chưa duyệt được.") };
+  refresh();
+  return { ok: true };
+}
+
+export async function rejectRsvpRequest(requestId: string, _prev: ActionState): Promise<ActionState> {
+  await requireUser();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("reject_rsvp_request", { p_request_id: uuid.parse(requestId) });
+  if (error) return { error: dbErrorMessage(error, "Chưa từ chối được.") };
+  refresh();
+  return { ok: true };
+}

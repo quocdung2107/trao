@@ -1,12 +1,20 @@
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { parseContent } from "./content";
-import type { InvitationSession, InvitationView } from "./view";
+import { withoutPartyIfGreeting, type InvitationSession, type InvitationView } from "./view";
 
 export const invitationTag = (slug: string) => `inv:${slug}`;
 
 export type Wish = { author_name: string; message: string; created_at: string };
-export type PublicInvitation = InvitationView & { slug: string; template_key: string; updated_at: string; wishes: Wish[] };
+export type PublicInvitation = InvitationView & {
+  slug: string;
+  template_key: string;
+  updated_at: string;
+  wishes: Wish[];
+  /** Chủ tiệc cho phép đăng ký tham dự qua link chung (luôn false với "Lời chúc"). */
+  open_rsvp: boolean;
+  rsvp_deadline: string | null;
+};
 
 /** Thiệp đã xuất bản, đọc bằng khóa publishable (không cookie) nên cache được; xóa cache khi chủ tiệc lưu. */
 export async function getPublishedInvitation(slug: string): Promise<PublicInvitation | null> {
@@ -31,9 +39,17 @@ export async function getPublishedInvitation(slug: string): Promise<PublicInvita
     event: { title: string; event_type: string };
     sessions: InvitationSession[];
     wishes?: Wish[];
+    open_rsvp?: boolean;
+    rsvp_deadline?: string | null;
   };
   if (!data) return null;
-  return { ...data, wishes: data.wishes ?? [], content: parseContent(data.content) };
+  return withoutPartyIfGreeting({
+    ...data,
+    wishes: data.wishes ?? [],
+    open_rsvp: data.open_rsvp === true,
+    rsvp_deadline: data.rsvp_deadline ?? null,
+    content: parseContent(data.content),
+  });
 }
 
 export type GuestInvite = Omit<InvitationSession, "id"> & {
@@ -67,3 +83,10 @@ export async function getGuestInvitation(slug: string, token: string): Promise<G
   if (!res.ok) throw new Error(`get_guest_invitation ${res.status}`);
   return (await res.json()) as GuestView | null;
 }
+
+export type OpenRsvpStatus = {
+  status: "pending" | "approved" | "rejected";
+  name: string;
+  party_size: number;
+  guest_token: string | null;
+};
