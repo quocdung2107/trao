@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { renderSVG } from "uqr";
@@ -55,6 +56,11 @@ async function Pass({ params }: { params: PageProps<"/c/[token]">["params"] }) {
           );
         })}
       </ul>
+      <p className="mt-8 text-xs text-muted">
+        <Link href={`/rieng-tu/${token}`} className="underline">
+          Thông tin của bạn và quyền riêng tư
+        </Link>
+      </p>
     </div>
   );
 }

@@ -60,6 +60,14 @@ async function Invitation({ props }: { props: PageProps<"/[slug]"> }) {
           <Link href="/" className="font-semibold underline">
             TRAO
           </Link>
+          {guest && token && (
+            <>
+              {" · "}
+              <Link href={`/rieng-tu/${token}`} className="underline">
+                Thông tin của bạn
+              </Link>
+            </>
+          )}
         </footer>
       }
     />

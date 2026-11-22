@@ -30,8 +30,9 @@ export default function DataPolicyPage() {
 
       <h2 className="mt-8 font-serif text-xl">Muốn sửa hoặc xóa thông tin?</h2>
       <p className="mt-3">
-        Bạn có thể mở lại link mời bất kỳ lúc nào để sửa câu trả lời (trước hạn chót). Để xóa thông tin của bạn khỏi sự kiện, hãy báo
-        chủ tiệc: họ xóa được ngay trong danh sách khách.
+        Bạn có thể mở lại link mời bất kỳ lúc nào để sửa câu trả lời (trước hạn chót). Trên thiệp và thẻ vào tiệc có mục “Thông tin
+        của bạn”: ở đó bạn xem TRAO đang lưu gì và tự xóa hẳn thông tin của mình khỏi sự kiện, không cần qua chủ tiệc. Bạn cũng có thể
+        báo chủ tiệc xóa trong danh sách khách.
       </p>
     </main>
   );
