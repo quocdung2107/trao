@@ -51,9 +51,53 @@ const SAMPLE: Record<FestiveKey, { photo: string; view: Omit<InvitationView, "co
         subtitle: "Gala cuối năm",
         message: "Cảm ơn bạn đã cùng công ty đi qua một năm thật đáng nhớ. Mời bạn đến buổi tiệc cuối năm: âm nhạc, trao giải và bốc thăm may mắn.",
         closing: "Dress code: Black & Gold.",
+        program: [
+          { time: "18:00", title: "Đón khách, chụp ảnh" },
+          { time: "18:30", title: "Khai mạc, tổng kết năm" },
+          { time: "19:00", title: "Tiệc tối và văn nghệ" },
+          { time: "20:30", title: "Trao giải, bốc thăm may mắn" },
+        ],
       },
       sessions: [
         { id: "s1", name: "Tiệc Gala", starts_at: "2026-12-27T11:30:00Z", ends_at: null, venue_name: "Sảnh Grand Ballroom", address: "Quận 1, TP.HCM", map_url: null },
+      ],
+    },
+  },
+  "noel-vintage": {
+    photo: "vintage",
+    view: {
+      event: { title: "Christmas Celebration", event_type: "christmas" },
+      content: {
+        heading: "Thân mời bạn",
+        title: "Christmas Celebration",
+        subtitle: "A little Christmas surprise",
+        people: [{ label: "Chủ tiệc", name: "Gia đình Minh Anh", detail: "" }],
+        message: "Mùa đông năm nay, nhà mình thắp đèn, trang trí cây thông\nvà chuẩn bị một bữa tối thật ấm.\nRất mong có bạn cùng chung vui đêm Giáng sinh!",
+        closing: "Hẹn gặp bạn dưới ánh đèn Giáng sinh.",
+        program: [
+          { time: "18:30", title: "Đón khách, cocktail ấm" },
+          { time: "19:00", title: "Tiệc tối Giáng sinh" },
+          { time: "20:30", title: "Trao quà Secret Santa" },
+        ],
+      },
+      sessions: [
+        { id: "s1", name: "Tiệc đêm Giáng sinh", starts_at: "2026-12-24T11:30:00Z", ends_at: "2026-12-24T15:00:00Z", venue_name: "The Pine House", address: "25 Lê Thánh Tôn, Quận 1, TP.HCM", map_url: null },
+      ],
+    },
+  },
+  "noel-bac-au": {
+    photo: "bac-au",
+    view: {
+      event: { title: "Tiệc cuối năm Studio Lặng", event_type: "corporate" },
+      content: {
+        heading: "Trân trọng kính mời",
+        title: "Tiệc cuối năm",
+        subtitle: "God Jul · Studio Lặng",
+        message: "Một buổi tối nhẹ nhàng để cảm ơn nhau sau một năm làm việc. Có rượu vang nóng, bánh quế và vài món quà nhỏ.",
+        closing: "Chúc bạn một mùa lễ bình yên.",
+      },
+      sessions: [
+        { id: "s1", name: "Tiệc tối", starts_at: "2026-12-20T11:00:00Z", ends_at: null, venue_name: "Studio Lặng", address: "8 Ngô Thời Nhiệm, Quận 3, TP.HCM", map_url: null },
       ],
     },
   },

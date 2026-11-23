@@ -493,35 +493,736 @@
   }
 }
 
-/* Người dùng chọn giảm chuyển động: tắt hết, giữ nút to và rõ. */
+
+/* ---------- Chữ hiện dần ---------- */
+.fx-letters {
+  display: block;
+}
+.fx-heroPhoto {
+  position: relative;
+  z-index: 1;
+}
+.fx-ch {
+  display: inline-block;
+  animation: fx-letter 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+/* Chưa mở thiệp hoặc khối chưa hiện: giữ chữ ẩn và chờ. */
+[data-fx-phase="closed"] [data-fx-body] .fx-ch,
+.fx-reveal:not(.fx-revealOn) .fx-ch {
+  animation-play-state: paused;
+  opacity: 0;
+}
+@keyframes fx-letter {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em) rotate(4deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fx-pulseText {
+  animation: fx-pulseText 2s ease-in-out infinite;
+}
+@keyframes fx-pulseText {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.fx-divider {
+  display: block;
+  width: 9rem;
+  height: 1px;
+  margin: 1.25rem auto 0;
+  background: linear-gradient(90deg, transparent, var(--inv-accent), transparent);
+  transform: scaleX(0);
+  transition: transform 1.1s cubic-bezier(0.6, 0, 0.2, 1) 0.2s;
+}
+.fx-revealOn .fx-divider {
+  transform: scaleX(1);
+}
+.fx-line {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+.fx-revealOn .fx-line {
+  opacity: 1;
+  transform: none;
+}
+.fx-popIn {
+  animation: fx-popIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+}
+.fx-reveal:not(.fx-revealOn) .fx-popIn {
+  animation-play-state: paused;
+  opacity: 0;
+}
+@keyframes fx-popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Lời chào đầu, giấy da ---------- */
+.fx-hero {
+  overflow: hidden;
+}
+.fx-heroGarland {
+  position: absolute;
+  top: -6px;
+  left: -4%;
+  width: 108%;
+}
+.fx-heroBow {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 7.5rem;
+  margin-left: -3.75rem;
+}
+.fx-coverGarland {
+  position: absolute;
+  top: -8px;
+  left: -4%;
+  width: 108%;
+}
+.fx-parchment {
+  margin: 1.25rem 1rem;
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #fffaf0 0%, var(--inv-card) 60%, #efe2c6 100%);
+  box-shadow:
+    inset 0 0 0 1px #c5a15a,
+    inset 0 0 0 6px var(--inv-card),
+    inset 0 0 0 7px color-mix(in srgb, #c5a15a 60%, transparent),
+    0 18px 40px -24px rgba(60, 30, 10, 0.5);
+}
+
+/* ---------- Trang trí ---------- */
+.fx-garland {
+  display: block;
+  height: auto;
+  pointer-events: none;
+}
+.fx-sway {
+  transform-origin: 50% 0;
+  animation: fx-sway 6s ease-in-out infinite;
+}
+@keyframes fx-sway {
+  0%,
+  100% {
+    transform: rotate(-0.6deg);
+  }
+  50% {
+    transform: rotate(0.6deg);
+  }
+}
+.fx-ornament {
+  animation: fx-ornament 3.6s ease-in-out infinite;
+}
+@keyframes fx-ornament {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+.fx-bulb {
+  animation: fx-bulb 2.4s ease-in-out infinite;
+}
+.fx-bulbGlow {
+  animation: fx-bulbGlow 2.4s ease-in-out infinite;
+}
+@keyframes fx-bulb {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes fx-bulbGlow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.05;
+  }
+}
+.fx-bow {
+  pointer-events: none;
+  animation: fx-float 4.5s ease-in-out infinite;
+}
+@keyframes fx-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+.fx-flicker {
+  animation: fx-flicker 3.2s ease-in-out infinite;
+}
+.fx-flame {
+  animation: fx-flame 2.1s ease-in-out infinite;
+}
+@keyframes fx-flicker {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 0.5;
+    transform: scale(1.06);
+  }
+  70% {
+    opacity: 0.3;
+    transform: scale(0.97);
+  }
+}
+@keyframes fx-flame {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.82;
+  }
+  60% {
+    opacity: 0.95;
+  }
+}
+.fx-flicker,
+.fx-ornament,
+.fx-tier,
+.fx-treeStar {
+  transform-box: fill-box;
+}
+.fx-flicker,
+.fx-treeStar {
+  transform-origin: center;
+}
+.fx-tier {
+  transform-origin: 50% 100%;
+  animation: fx-tier 0.7s cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+}
+.fx-reveal:not(.fx-revealOn) .fx-tier {
+  animation-play-state: paused;
+}
+@keyframes fx-tier {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.fx-treeStar {
+  animation: fx-glow 2.6s ease-in-out infinite;
+}
+.fx-tree {
+  display: block;
+  overflow: visible;
+}
+.fx-finale {
+  overflow: hidden;
+}
+.fx-finaleGarland {
+  position: absolute;
+  top: -6px;
+  left: -4%;
+  width: 108%;
+}
+.fx-finale .fx-tree {
+  margin-top: 1.5rem;
+}
+.fx-draw {
+  stroke-dasharray: 400;
+  animation: fx-draw 2.4s ease both 0.3s;
+}
+@keyframes fx-draw {
+  from {
+    stroke-dashoffset: 400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Phong bì 3D (Vintage) ---------- */
+.fx-env3d {
+  position: relative;
+  width: 16rem;
+  height: 11rem;
+  margin: 0 auto;
+  perspective: 900px;
+  animation: fx-envBreath 3.2s ease-in-out infinite;
+}
+@keyframes fx-envBreath {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.035);
+  }
+}
+.fx-envBack,
+.fx-envFront,
+.fx-envFlap {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.5rem;
+}
+.fx-envBack {
+  background: #6f161d;
+  box-shadow: 0 24px 48px -18px rgba(0, 0, 0, 0.7);
+}
+.fx-envFront {
+  z-index: 3;
+  background: linear-gradient(160deg, #a42a33, #7a1a21);
+  clip-path: polygon(0 28%, 50% 62%, 100% 28%, 100% 100%, 0 100%);
+}
+.fx-envFront::after {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border: 1px solid rgba(197, 161, 90, 0.6);
+  border-radius: 0.35rem;
+  clip-path: polygon(0 28%, 50% 60%, 100% 28%, 100% 100%, 0 100%);
+}
+.fx-envFlap {
+  z-index: 4;
+  height: 62%;
+  background: linear-gradient(180deg, #b0313a, #8b2028);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: 50% 0;
+  transition:
+    transform 0.7s cubic-bezier(0.5, 0, 0.3, 1) 0.25s,
+    z-index 0s linear 0.6s;
+  backface-visibility: hidden;
+}
+.fx-envSeal {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  top: 46%;
+  display: flex;
+  width: 3.2rem;
+  height: 3.2rem;
+  margin: -1.6rem 0 0 -1.6rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 30%, #d9b46a, #9c7a35 70%);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.15);
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.fx-envCard {
+  position: absolute;
+  z-index: 2;
+  left: 8%;
+  right: 8%;
+  top: 8%;
+  bottom: 8%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.75rem;
+  border-radius: 0.35rem;
+  background: #f4ebd8;
+  box-shadow: inset 0 0 0 1px #c5a15a;
+  transition: transform 0.8s cubic-bezier(0.3, 0, 0.2, 1) 0.75s;
+}
+.fx-envLight {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 10%;
+  width: 18rem;
+  height: 18rem;
+  margin-left: -9rem;
+  margin-top: -9rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 224, 150, 0.85) 0%, rgba(255, 224, 150, 0) 65%);
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.6s ease 0.55s,
+    transform 0.9s ease 0.55s;
+}
+/* Chuỗi mở: dấu niêm mờ đi → nắp lật lên → ánh sáng → thiệp trồi lên → phóng to → cả bìa mờ dần. */
+.fx-cover3d.fx-coverLeaving {
+  transform: none;
+  opacity: 0;
+  transition: opacity 0.6s ease 1.65s;
+}
+.fx-cover3d.fx-coverLeaving .fx-coverArt {
+  transform: none;
+}
+.fx-cover3d.fx-coverLeaving .fx-env3d {
+  animation: none;
+}
+.fx-cover3d.fx-coverLeaving .fx-envSeal {
+  opacity: 0;
+  transform: scale(1.4);
+}
+.fx-cover3d.fx-coverLeaving .fx-envFlap {
+  z-index: 1;
+  transform: rotateX(180deg);
+}
+.fx-cover3d.fx-coverLeaving .fx-envLight {
+  opacity: 1;
+  transform: scale(1.3);
+}
+.fx-cover3d.fx-coverLeaving .fx-envCard {
+  z-index: 6;
+  transform: translateY(-62%) scale(1.9);
+  transition:
+    transform 0.75s cubic-bezier(0.3, 0, 0.2, 1) 0.75s,
+    z-index 0s linear 1.2s;
+}
+.fx-cover3d .fx-openWrap,
+.fx-cover3d .fx-subtle {
+  transition: opacity 0.25s ease;
+}
+.fx-cover3d.fx-coverLeaving .fx-openWrap,
+.fx-cover3d.fx-coverLeaving .fx-subtle {
+  opacity: 0;
+}
+
+/* ---------- Thông tin buổi ---------- */
+.fx-calendar {
+  margin: 0 auto;
+  max-width: 17rem;
+  padding: 0.9rem 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid var(--inv-line);
+}
+.fx-calDay {
+  position: relative;
+  z-index: 0;
+  padding-block: 0.25rem;
+  font-weight: 700;
+  color: var(--inv-bg);
+}
+.fx-calDay::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: 2rem;
+  height: 2rem;
+  margin: -1rem 0 0 -1rem;
+  border-radius: 999px;
+  background: var(--inv-accent);
+  animation: fx-glow 2.4s ease-in-out infinite;
+}
+.fx-pin {
+  display: inline-block;
+  animation: fx-float 2.4s ease-in-out infinite;
+}
+.fx-map {
+  height: 12rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--inv-line);
+}
+.fx-mapPlaceholder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--inv-accent);
+  background:
+    linear-gradient(0deg, color-mix(in srgb, var(--inv-line) 55%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, color-mix(in srgb, var(--inv-line) 55%, transparent) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--inv-card);
+}
+.fx-mapPin {
+  font-size: 2rem;
+  animation: fx-float 1.8s ease-in-out infinite;
+}
+.fx-timeline {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  padding-left: 1.1rem;
+  border-left: 2px solid var(--inv-line);
+}
+.fx-timelineItem {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+.fx-timelineItem::before {
+  content: "";
+  position: absolute;
+  left: calc(-1.1rem - 6px);
+  top: 0.4rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--inv-accent);
+}
+.fx-revealOn .fx-timelineItem {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Album: kiểu thường + xem phóng to ---------- */
+.fx-plain {
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px -14px rgba(0, 0, 0, 0.35);
+}
+.fx-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+  animation: fx-fade 0.25s ease both;
+}
+.fx-lightboxImg {
+  max-width: 100%;
+  max-height: 86svh;
+  object-fit: contain;
+  animation: fx-popIn 0.35s ease both;
+}
+.fx-lbBtn {
+  position: absolute;
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1.5rem;
+}
+.fx-lbBtn.top-1\/2 {
+  margin-top: -1.375rem;
+}
+@keyframes fx-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- Hộp quà ---------- */
+.fx-gift {
+  position: relative;
+  width: 8.5rem;
+  height: 8rem;
+  cursor: pointer;
+  animation: fx-giftWiggle 3.2s ease-in-out infinite;
+}
+.fx-giftOpen {
+  animation: none;
+  cursor: default;
+}
+@keyframes fx-giftWiggle {
+  0%,
+  80%,
+  100% {
+    transform: rotate(0);
+  }
+  84% {
+    transform: rotate(-4deg);
+  }
+  88% {
+    transform: rotate(4deg);
+  }
+  92% {
+    transform: rotate(-2deg);
+  }
+}
+.fx-giftBox {
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0;
+  height: 5.2rem;
+  border-radius: 0.35rem;
+  background:
+    linear-gradient(90deg, transparent 43%, #c5a15a 43%, #c5a15a 57%, transparent 57%),
+    linear-gradient(160deg, #a42a33, #7a1a21);
+}
+.fx-giftLid {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  top: 1.4rem;
+  height: 1.6rem;
+  border-radius: 0.3rem;
+  background:
+    linear-gradient(90deg, transparent 42%, #d9b46a 42%, #d9b46a 58%, transparent 58%),
+    linear-gradient(180deg, #b0313a, #8b2028);
+  box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.5);
+  transform-origin: 0 100%;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1.3);
+}
+.fx-giftLid::before,
+.fx-giftLid::after {
+  /* Nơ trên nắp. */
+  content: "";
+  position: absolute;
+  top: -1.2rem;
+  width: 1.6rem;
+  height: 1.3rem;
+  border: 4px solid #d9b46a;
+  border-radius: 999px 999px 0 999px;
+}
+.fx-giftLid::before {
+  left: calc(50% - 1.6rem);
+}
+.fx-giftLid::after {
+  left: 50%;
+  transform: scaleX(-1);
+}
+.fx-giftOpen .fx-giftLid {
+  transform: translate(-0.4rem, -1.2rem) rotate(-24deg);
+}
+.fx-giftGlow {
+  position: absolute;
+  left: 50%;
+  top: 2.6rem;
+  width: 10rem;
+  height: 10rem;
+  margin: -5rem 0 0 -5rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 224, 150, 0.9), rgba(255, 224, 150, 0) 65%);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity 0.6s ease 0.25s,
+    transform 0.8s ease 0.25s;
+}
+.fx-giftOpen .fx-giftGlow {
+  opacity: 1;
+  transform: scale(1.2);
+}
+.fx-giftMsg {
+  min-height: 1.5em;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.7s ease 0.5s,
+    transform 0.7s ease 0.5s;
+}
+.fx-giftMsgOn {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Menu "⋯" ---------- */
+.fx-menu {
+  position: absolute;
+  right: 0;
+  bottom: 3.25rem;
+  display: grid;
+  min-width: 14rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--inv-fg) 12%, transparent);
+  background: var(--inv-card);
+  color: var(--inv-fg);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.45);
+  animation: fx-fade 0.15s ease both;
+}
+.fx-menuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-size: 0.9rem;
+}
+.fx-menuItem + .fx-menuItem {
+  border-top: 1px solid var(--inv-line);
+}
+
+/* ---------- Thông báo nhỏ ---------- */
+.fx-toast {
+  position: absolute;
+  bottom: 3.5rem;
+  left: 1rem;
+  right: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: rgba(20, 20, 20, 0.88);
+  color: #fff;
+  font-size: 0.875rem;
+  text-align: center;
+  word-break: break-all;
+  animation: fx-fade 0.2s ease both;
+}
+
+/* ---------- Giảm chuyển động: cài đặt hệ thống hoặc nút ✨ trên thiệp ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .fx-openBtn,
-  .fx-openBtn::after,
-  .fx-ripple,
-  .fx-note,
-  .fx-hintOn,
-  .fx-envelope,
-  .fx-starGlow,
-  .fx-marqueeTrack,
-  .fx-kenburns,
-  .fx-polaroid,
-  .fx-fabSpin,
-  .fx-body {
+  [data-fx-phase] *,
+  [data-fx-phase] *::before,
+  [data-fx-phase] *::after {
     animation: none !important;
   }
-  .fx-ripple,
-  .fx-openBtn::after {
-    display: none;
+  [data-fx-phase] * {
+    transition-property: opacity !important;
+    transition-duration: 0.3s !important;
+    transition-delay: 0s !important;
   }
-  .fx-cover,
-  .fx-coverArt,
-  .fx-reveal {
-    transition: opacity 0.3s ease !important;
+  .fx-ripple,
+  .fx-openBtn::after,
+  .fx-hint {
+    display: none;
   }
   .fx-coverLeaving,
   .fx-coverLeaving .fx-coverArt,
-  .fx-reveal {
+  .fx-reveal,
+  .fx-line,
+  .fx-timelineItem {
     transform: none !important;
+  }
+  .fx-divider {
+    transform: none;
   }
   .fx-marquee {
     white-space: normal;
@@ -533,4 +1234,28 @@
   .fx-marqueeTrack span[aria-hidden] {
     display: none;
   }
+}
+.fx-calm *,
+.fx-calm *::before,
+.fx-calm *::after {
+  animation: none !important;
+}
+.fx-calm .fx-reveal,
+.fx-calm .fx-line,
+.fx-calm .fx-timelineItem {
+  transform: none !important;
+  transition-property: opacity !important;
+}
+.fx-calm .fx-divider {
+  transform: none;
+}
+.fx-calm .fx-marquee {
+  white-space: normal;
+  text-align: center;
+}
+.fx-calm .fx-marqueeTrack {
+  display: block;
+}
+.fx-calm .fx-marqueeTrack span[aria-hidden] {
+  display: none;
 }

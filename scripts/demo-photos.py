@@ -52,8 +52,16 @@ imgs = {
   "gala-1": lambda: bokeh(grad((26, 24, 30), (8, 8, 10)), gold, 90, 14, 60, 12, 12),
   "gala-2": lambda: (lambda im: (gifts(im, 13, [(25, 25, 28), (60, 50, 30), (120, 95, 45)]), im)[1])(bokeh(grad((24, 22, 28), (6, 6, 8)), gold, 70, 10, 50, 12, 14)),
   "gala-3": lambda: bokeh(bokeh(grad((20, 18, 22), (5, 5, 6)), gold, 40, 40, 110, 26, 15), gold, 60, 3, 10, 2, 16),
+  "vintage-1": lambda: tree(bokeh(grad((22, 62, 46), (10, 30, 22)), gold + [(139, 32, 40)], 60, 15, 60, 14, 21), 450, 760, 560, (20, 70, 48), [(197, 161, 90), (139, 32, 40), (255, 230, 170)], 22),
+  "vintage-2": lambda: (lambda im: (gifts(im, 23, [(139, 32, 40), (16, 45, 35), (110, 25, 30)]), im)[1])(bokeh(grad((60, 20, 26), (20, 10, 10)), gold, 70, 12, 55, 12, 24)),
+  "vintage-3": lambda: bokeh(bokeh(grad((16, 45, 35), (6, 18, 12)), [(197, 161, 90), (244, 235, 216)], 45, 30, 90, 22, 25), [(139, 32, 40), (197, 161, 90)], 40, 6, 16, 4, 26),
+  "bac-au-1": lambda: tree(bokeh(grad((246, 244, 238), (226, 222, 212)), [(255, 255, 255), (210, 200, 180)], 40, 20, 70, 18, 31), 450, 760, 560, (46, 90, 71), [(201, 162, 90), (255, 250, 230)], 32),
+  "bac-au-2": lambda: (lambda im: (gifts(im, 33, [(46, 90, 71), (190, 170, 140), (230, 226, 216)]), im)[1])(bokeh(grad((250, 248, 243), (230, 226, 216)), [(255, 255, 255), (220, 210, 190)], 40, 20, 60, 16, 34)),
+  "bac-au-3": lambda: bokeh(grad((240, 238, 232), (214, 210, 200)), [(255, 255, 255), (201, 162, 90)], 60, 10, 50, 14, 35),
 }
+only = set(sys.argv[2:])
 for name, f in imgs.items():
+    if only and not any(name.startswith(o) for o in only): continue
     im = f(); im = im.convert("RGB")
     im.save(f"{out}/{name}.webp", "WEBP", quality=78)
     if name.endswith("-1"): im.resize((720, 900)).save(f"{out}/{name}.jpg", "JPEG", quality=82)
