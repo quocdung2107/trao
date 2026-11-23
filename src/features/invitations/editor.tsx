@@ -200,7 +200,7 @@ export function InvitationEditor(props: Props) {
           {/* Tùy chọn riêng của mẫu lễ hội */}
           {isFestiveTemplate(templateKey) && (
             <fieldset className="space-y-3">
-              <legend className="mb-2 font-serif text-lg">Nhạc và hiệu ứng</legend>
+              <legend className="mb-2 font-serif text-lg">Nhạc, chương trình và hiệu ứng</legend>
               <div>
                 <Label htmlFor="music">Nhạc nền</Label>
                 <select
@@ -230,6 +230,53 @@ export function InvitationEditor(props: Props) {
                 <Label htmlFor="marquee">Chữ chạy</Label>
                 <Input id="marquee" value={content.marquee} maxLength={160} onChange={(e) => set("marquee", e.target.value)} placeholder="Để trống để dùng câu mặc định của mẫu" />
               </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Chương trình (không bắt buộc)</p>
+                {content.program.map((it, i) => (
+                  <div key={i} className="grid grid-cols-[80px_1fr_auto] gap-2">
+                    <Input
+                      aria-label="Giờ"
+                      value={it.time}
+                      maxLength={10}
+                      placeholder="18:00"
+                      onChange={(e) => set("program", content.program.map((x, j) => (j === i ? { ...x, time: e.target.value } : x)))}
+                    />
+                    <Input
+                      aria-label="Nội dung"
+                      value={it.title}
+                      maxLength={80}
+                      placeholder="Đón khách"
+                      onChange={(e) => set("program", content.program.map((x, j) => (j === i ? { ...x, title: e.target.value } : x)))}
+                    />
+                    <button type="button" className="text-sm text-danger" onClick={() => set("program", content.program.filter((_, j) => j !== i))}>
+                      Bỏ
+                    </button>
+                  </div>
+                ))}
+                {content.program.length < 10 && (
+                  <button type="button" className="text-sm font-medium text-brand" onClick={() => set("program", [...content.program, { time: "", title: "" }])}>
+                    + Thêm mục
+                  </button>
+                )}
+              </div>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={content.showGift} onChange={(e) => set("showGift", e.target.checked)} />
+                Hộp quà bấm để mở, có lời chúc bất ngờ
+              </label>
+              {content.showGift && (
+                <div>
+                  <Label htmlFor="giftMessage">Lời chúc trong hộp quà</Label>
+                  <textarea
+                    id="giftMessage"
+                    className={textarea}
+                    rows={2}
+                    maxLength={300}
+                    value={content.giftMessage}
+                    onChange={(e) => set("giftMessage", e.target.value)}
+                    placeholder="Để trống để dùng câu mặc định của mẫu"
+                  />
+                </div>
+              )}
             </fieldset>
           )}
 

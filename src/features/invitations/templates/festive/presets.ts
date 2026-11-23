@@ -2,9 +2,12 @@
  * Preset của engine thiệp lễ hội: chỉ là dữ liệu. Thêm preset mới = thêm một mục ở đây
  * (và nếu cần một kiểu bìa/album/hạt mới thì thêm vào union tương ứng trong engine).
  */
-export type ParticleKind = "snow" | "stars" | "glitter" | "none";
-export type CoverKind = "envelope" | "star" | "deco";
-export type AlbumKind = "polaroid" | "arch" | "film";
+export type ParticleKind = "snow" | "stars" | "glitter" | "snowgold" | "none";
+/** envelope3d: phong bì mở nắp 3D, thiệp trồi lên rồi phóng to. */
+export type CoverKind = "envelope" | "envelope3d" | "star" | "deco" | "nordic";
+export type AlbumKind = "polaroid" | "arch" | "film" | "plain";
+/** Lớp trang trí quanh thiệp (cành thông, nơ, đèn, quả châu…). */
+export type DecorKind = "vintage" | "none";
 
 export type FestivePreset = {
   name: string;
@@ -25,6 +28,9 @@ export type FestivePreset = {
     buttonFg: string;
   };
   headingFont: "serif" | "display" | "sans";
+  /** Dùng chữ viết tay cho lời nhắn cá nhân (lời mời, lời chúc, hộp quà). */
+  script?: boolean;
+  decor?: DecorKind;
   cover: CoverKind;
   album: AlbumKind;
   particles: ParticleKind;
@@ -34,6 +40,10 @@ export type FestivePreset = {
   marquee: string;
   /** Dòng chữ nhỏ trên màn bìa, trên tên sự kiện. */
   coverKicker: string;
+  /** Câu trong hộp quà khi chủ tiệc không nhập. */
+  gift: string;
+  /** Chữ lớn ở phần lời chào cuối. */
+  finale: string;
 };
 
 export const FESTIVE_PRESETS = {
@@ -59,6 +69,8 @@ export const FESTIVE_PRESETS = {
     music: "lo-suoi",
     marquee: "Cả nhà mình cùng đón Noel nhé ✦ Giáng sinh an lành ✦ Merry Christmas",
     coverKicker: "Giáng sinh an lành",
+    gift: "Chúc cả nhà một mùa Giáng sinh ấm áp, đủ đầy và thật nhiều tiếng cười!",
+    finale: "Merry Christmas",
   },
   "noel-dem-thanh": {
     name: "Noel · Đêm Thánh",
@@ -82,6 +94,8 @@ export const FESTIVE_PRESETS = {
     music: "dem-thanh",
     marquee: "Vinh danh Thiên Chúa trên các tầng trời ✦ Bình an dưới thế cho loài người Chúa thương",
     coverKicker: "Mừng Chúa Giáng Sinh",
+    gift: "Nguyện xin Chúa Hài Đồng ban bình an và niềm vui cho bạn cùng gia đình.",
+    finale: "Gloria in Excelsis Deo",
   },
   "noel-gala": {
     name: "Noel · Gala cuối năm",
@@ -105,6 +119,60 @@ export const FESTIVE_PRESETS = {
     music: "gala",
     marquee: "Year End Party ✦ Cảm ơn một năm đồng hành ✦ Cheers to 2027",
     coverKicker: "Trân trọng kính mời",
+    gift: "Cảm ơn bạn vì một năm tuyệt vời. Hẹn gặp bạn ở bữa tiệc, một bất ngờ nhỏ đang chờ!",
+    finale: "Cheers to 2027",
+  },
+  "noel-vintage": {
+    name: "Noel · Vintage",
+    description: "Xanh rừng, đỏ rượu và vàng cổ. Phong bì mở 3D, nơ nhung, cành thông, dây đèn, quả châu. Hợp tiệc gia đình, bạn bè, công ty.",
+    vars: {
+      bg: "#f4ebd8",
+      fg: "#2a2118",
+      muted: "#7c6a55",
+      accent: "#8b2028",
+      line: "#dcc9a3",
+      card: "#fbf5e9",
+      coverBg: "radial-gradient(110% 70% at 50% 40%, #1a4434 0%, #102d23 55%, #08170f 100%)",
+      coverFg: "#f4ebd8",
+      button: "linear-gradient(100deg, #a8843f 0%, #e6c987 45%, #b38d45 100%)",
+      buttonFg: "#2a1a0c",
+    },
+    headingFont: "display",
+    script: true,
+    decor: "vintage",
+    cover: "envelope3d",
+    album: "polaroid",
+    particles: "snowgold",
+    music: "lo-suoi",
+    marquee: "JOY • PEACE • LOVE • MERRY CHRISTMAS •",
+    coverKicker: "A little Christmas surprise",
+    gift: "Một món quà nhỏ cho bạn: lời chúc Giáng sinh an lành, ấm áp và thật nhiều yêu thương!",
+    finale: "Merry Christmas",
+  },
+  "noel-bac-au": {
+    name: "Noel · Bắc Âu",
+    description: "Trắng, xanh thông và gỗ sáng, nhiều khoảng trắng, ít chuyển động. Nhẹ máy, hợp công ty nhỏ và người thích thanh lịch.",
+    vars: {
+      bg: "#fbfaf7",
+      fg: "#1f2b26",
+      muted: "#6f7a74",
+      accent: "#2e5a47",
+      line: "#e4e1d8",
+      card: "#ffffff",
+      coverBg: "linear-gradient(180deg, #ffffff 0%, #f1efe9 100%)",
+      coverFg: "#1f2b26",
+      button: "#2e5a47",
+      buttonFg: "#ffffff",
+    },
+    headingFont: "sans",
+    cover: "nordic",
+    album: "plain",
+    particles: "none",
+    music: "dem-thanh",
+    marquee: "God Jul ✦ Giáng sinh an lành ✦ Merry Christmas",
+    coverKicker: "God Jul",
+    gift: "Chúc bạn một mùa lễ bình yên, ấm áp bên những người thân yêu.",
+    finale: "God Jul",
   },
 } satisfies Record<string, FestivePreset>;
 

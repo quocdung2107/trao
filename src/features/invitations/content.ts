@@ -12,6 +12,12 @@ export const personSchema = z.object({
   detail: z.string().trim().max(160).default(""),
 });
 
+export const programItemSchema = z.object({
+  time: z.string().trim().max(10).default(""),
+  title: z.string().trim().max(80).default(""),
+});
+export type ProgramItem = z.infer<typeof programItemSchema>;
+
 /** Nội dung thiệp dùng chung cho mọi mẫu; mẫu chỉ khác cách trình bày. */
 export const invitationContentSchema = z.object({
   heading: z.string().trim().max(80).default("Trân trọng kính mời"),
@@ -31,6 +37,11 @@ export const invitationContentSchema = z.object({
   music: z.string().regex(/^[a-z0-9-]{1,40}$/).default("preset"),
   /** Chữ chạy; để trống thì dùng câu mặc định của mẫu. */
   marquee: z.string().trim().max(160).default(""),
+  /** Chương trình buổi tiệc theo giờ (vd 18:00 Đón khách). */
+  program: z.array(programItemSchema).max(10).default([]),
+  /** Hộp quà bấm để mở; lời nhắn trống thì dùng câu mặc định của mẫu. */
+  showGift: z.boolean().default(true),
+  giftMessage: z.string().trim().max(300).default(""),
 });
 
 export type InvitationContent = z.infer<typeof invitationContentSchema>;
